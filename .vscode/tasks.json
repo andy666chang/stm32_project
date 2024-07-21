@@ -1,0 +1,97 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "del build",
+            "type": "shell",
+            "command": "del build",
+            "args": [
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+        },
+        {
+            "label": "mkdir build",
+            "type": "shell",
+            "command": "mkdir build",
+            "args": [
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "del build",
+            ]
+        },
+        {
+            "label": "select",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "../app/${input:param1}/",
+                "-G",
+                "Ninja"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            },
+            "dependsOn": [
+                "mkdir build",
+            ]
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "-j16"
+            ],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            }
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "ninja clean",
+            "args": [],
+            "group": "build",
+            "options": {
+                "cwd": "${workspaceFolder}/build"
+            }
+        },
+        {
+            "label": "download",
+            "type": "shell",
+            "command": "openocd",
+            "args": [
+                "-f",
+                "tools/openocd/interface/stlink-v2-1.cfg",
+                "-f",
+                "tools/openocd/target/stm32f1x.cfg",
+                "-c",
+                "program build/test.elf verify reset exit"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "param1",
+            "description": "Param1:",
+            "default": "Hello",
+            "type": "promptString"
+        },
+    ]
+}
