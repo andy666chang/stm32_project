@@ -85,6 +85,28 @@
                 "cwd": "${workspaceFolder}"
             }
         }
+
+        // daplink
+        // {
+        //     "label": "download",
+        //     "type": "shell",
+        //     "command": "pyocd",
+        //     "args": [
+        //         "flash",
+        //         "--erase",
+        //         "chip",
+        //         "--target",
+        //         "stm32f103c8",
+        //         "--base-address",
+        //         "0x8000000",
+        //         "build/test.elf"
+        //     ],
+        //     "group": "build",
+        //     "problemMatcher": [],
+        //     "options": {
+        //         "cwd": "${workspaceFolder}"
+        //     }
+        // }
     ],
     "inputs": [
         {

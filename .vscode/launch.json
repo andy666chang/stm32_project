@@ -19,5 +19,22 @@
             "executable": "build/test.elf"
             // "svdFile": null
         }
+
+        // daplink
+        // {
+        //     "name": "Cortex Debug",
+        //     "cwd": "${workspaceFolder}",
+        //     "request": "launch",
+        //     "type": "cortex-debug",
+        //     "runToEntryPoint": "main",
+        //     "servertype": "pyocd",
+        //     "interface": "swd",
+        //     "configFiles": [
+        //         "tools/openocd/interface/stlink-dap.cfg",
+        //         "tools/openocd/target/stm32f1x.cfg"
+        //     ],
+        //     "executable": "build/test.elf"
+        //     // "svdFile": null
+        // }
     ]
 }
