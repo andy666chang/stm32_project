@@ -16,8 +16,20 @@
                 "tools/openocd/interface/stlink.cfg",
                 "tools/openocd/target/stm32f1x.cfg"
             ],
-            "executable": "build/test.elf"
+            "executable": "build/test_rtt.elf",
             // "svdFile": null
+
+            "rttConfig": {
+                "enabled": true,
+                "address": "auto",
+                "decoders": [
+                    {
+                        "label": "",
+                        "port": 0,
+                        "type": "console"
+                    }
+                ]
+            }
         }
 
         // daplink
