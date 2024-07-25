@@ -77,7 +77,7 @@
                 "-f",
                 "tools/openocd/target/stm32f1x.cfg",
                 "-c",
-                "program build/test.elf verify reset exit"
+                "program build/test_rtt.elf verify reset exit"
             ],
             "group": "build",
             "problemMatcher": [],

@@ -48,11 +48,17 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
+
+    ../../components/RTT/RTT/SEGGER_RTT.c
+    ../../components/RTT/RTT/SEGGER_RTT_printf.c
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+
+    ../../components/RTT/RTT/
+    ../../components/RTT/Config
 )
 
 # Add project symbols (macros)

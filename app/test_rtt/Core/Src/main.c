@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,11 +92,26 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  SEGGER_RTT_printf(0, "Hi RTT\n");
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    while ( SEGGER_RTT_HasKey() ) {
+      char buf[256] = {0};
+      uint16_t i = 0;
+      for (i = 0; SEGGER_RTT_HasKey(); i++)
+      {
+        buf[i] = SEGGER_RTT_GetKey();
+      }
+      
+      SEGGER_RTT_printf(0, "Input len: %d\n",i);
+      SEGGER_RTT_printf(0, "Input data: %s\n\n",buf);
+    }
+    
+    SEGGER_RTT_printf(0, "RTT delay 500ms ...\n");
+    HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
