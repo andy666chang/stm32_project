@@ -10,3 +10,6 @@
 [submodule "STM32CubeG0.git"]
 	path = sdk/STM32CubeG0
 	url = git@github.com:STMicroelectronics/STM32CubeG0.git
+[submodule "osal.git"]
+	path = components/osal
+	url = git@github.com:andy666chang/osal.git
