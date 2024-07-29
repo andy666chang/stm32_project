@@ -3,7 +3,7 @@
     "fileheader.Author": "andy.chang",
     "fileheader.LastModifiedBy": "andy.chang",
 
-    "cmake.sourceDirectory": "${workspaceFolder}/app/test",
+    "cmake.sourceDirectory": "${workspaceFolder}/app/test_rtt",
     "cmake.buildDirectory": "${workspaceFolder}/build",
     "cmake.generator": "Ninja",
     "editor.mouseWheelZoom": true,
