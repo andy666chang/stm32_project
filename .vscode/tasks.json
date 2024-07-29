@@ -67,39 +67,17 @@
                 "cwd": "${workspaceFolder}/build"
             }
         },
-        {
-            "label": "download",
-            "type": "shell",
-            "command": "openocd",
-            "args": [
-                "-f",
-                "tools/openocd/interface/stlink-v2-1.cfg",
-                "-f",
-                "tools/openocd/target/stm32f1x.cfg",
-                "-c",
-                "program build/test.elf verify reset exit"
-            ],
-            "group": "build",
-            "problemMatcher": [],
-            "options": {
-                "cwd": "${workspaceFolder}"
-            }
-        }
-
-        // daplink
         // {
         //     "label": "download",
         //     "type": "shell",
-        //     "command": "pyocd",
+        //     "command": "openocd",
         //     "args": [
-        //         "flash",
-        //         "--erase",
-        //         "chip",
-        //         "--target",
-        //         "stm32f103c8",
-        //         "--base-address",
-        //         "0x8000000",
-        //         "build/test.elf"
+        //         "-f",
+        //         "tools/openocd/interface/stlink-v2-1.cfg",
+        //         "-f",
+        //         "tools/openocd/target/stm32f1x.cfg",
+        //         "-c",
+        //         "program build/test.elf verify reset exit"
         //     ],
         //     "group": "build",
         //     "problemMatcher": [],
@@ -107,6 +85,28 @@
         //         "cwd": "${workspaceFolder}"
         //     }
         // }
+
+        // daplink
+        {
+            "label": "download",
+            "type": "shell",
+            "command": "pyocd",
+            "args": [
+                "flash",
+                "--erase",
+                "chip",
+                "--target",
+                "stm32f103c8",
+                "--base-address",
+                "0x8000000",
+                "build/test_osal.elf"
+            ],
+            "group": "build",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
     ],
     "inputs": [
         {
