@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SEGGER_RTT.h"
+#include "components/log/log.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define TAG "main"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -87,7 +88,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  log_route(HAL_GetTick);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -111,6 +112,7 @@ int main(void)
     }
     
     SEGGER_RTT_printf(0, "RTT delay 500ms ...\n");
+    LOGI(TAG, "LED blink!");
     HAL_Delay(500);
   }
   /* USER CODE END 3 */
