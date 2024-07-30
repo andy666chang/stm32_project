@@ -14,10 +14,10 @@ target_compile_definitions(stm32cubemx INTERFACE
 
 target_include_directories(stm32cubemx INTERFACE
     ../../Core/Inc
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Inc
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/CMSIS/Device/ST/STM32F1xx/Include
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/CMSIS/Include
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Inc
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Inc/Legacy
+    ../../../../sdk/STM32CubeF1/Drivers/CMSIS/Device/ST/STM32F1xx/Include
+    ../../../../sdk/STM32CubeF1/Drivers/CMSIS/Include
 )
 
 target_sources(stm32cubemx INTERFACE
@@ -25,19 +25,19 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/gpio.c
     ../../Core/Src/stm32f1xx_it.c
     ../../Core/Src/stm32f1xx_hal_msp.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
-    D:/Andy/Desktop/stm_project/sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c
+    ../../../../sdk/STM32CubeF1/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_exti.c
     ../../Core/Src/system_stm32f1xx.c
     ../../Core/Src/sysmem.c
     ../../Core/Src/syscalls.c

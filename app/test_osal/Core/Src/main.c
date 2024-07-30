@@ -25,6 +25,8 @@
 #include "osal.h"
 #include "osal_tasks.h"
 #include "osal_timers.h"
+
+#include "services/led/service.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,15 +58,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t led_task(uint8_t id, uint16_t events){
-  (void) id;
-  (void) events;
 
-  // TODO: LED blink once
-  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-
-  return 0;
-}
 /* USER CODE END 0 */
 
 /**
@@ -104,8 +98,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   osal_init_system();
 
-  osal_task_create(1, led_task);
-  osal_start_reload_timer( 1, 1, 500);
+  led_service_init();
 
   osal_start_system();
 

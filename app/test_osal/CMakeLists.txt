@@ -55,6 +55,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/osal/src/osal_tasks.c
     ../../components/osal/src/osal_timers.c
     ../../components/osal/src/osal.c
+    services/led/service.c
 )
 
 # Add include paths
@@ -63,7 +64,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
 
     ../../components/osal/inc
     components/osal
-
+    .
 )
 
 # Add project symbols (macros)
