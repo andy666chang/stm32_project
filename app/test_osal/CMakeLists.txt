@@ -55,6 +55,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/osal/src/osal_tasks.c
     ../../components/osal/src/osal_timers.c
     ../../components/osal/src/osal.c
+    ../../components/ring_buf/ring_buf.c
     services/led/service.c
 )
 
@@ -63,6 +64,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
 
     ../../components/osal/inc
+    ../../components/ring_buf
     components/osal
     .
 )

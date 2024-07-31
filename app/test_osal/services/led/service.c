@@ -1,9 +1,18 @@
+/*
+ * @Author: andy.chang 
+ * @Date: 2024-08-01 00:31:12 
+ * @Last Modified by: andy.chang
+ * @Last Modified time: 2024-08-01 01:56:34
+ */
+
 #ifndef LED_SERVICE_H
 #define LED_SERVICE_H
 
 #include "osal.h"
 #include "osal_tasks.h"
 #include "osal_timers.h"
+
+#include "ring_buf.h"
 
 #include "main.h"
 #include "gpio.h"
@@ -12,14 +21,29 @@
 #define LED_TIME_EVENT 0x01
 #define LED_TIMEOUT_MS 500
 
+static uint16_t led_buf[5];
+static struct ring_buf led;
+
+/**
+ * @brief 
+ * 
+ * @param id 
+ * @param events 
+ * @return uint16_t 
+ */
 static uint16_t led_task(uint8_t id, uint16_t events){
   (void) id;
   (void) events;
+  static uint16_t a = 1;
 
   switch(events) {
     case LED_TIME_EVENT:
       // LED blink 
       HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+
+      ring_buf_push(&led, &a);
+      ring_buf_pop(&led, &a);
+      a++;
       break;
     default:
       break;
@@ -28,7 +52,14 @@ static uint16_t led_task(uint8_t id, uint16_t events){
   return 0;
 }
 
+/**
+ * @brief 
+ * 
+ * @return uint8_t 
+ */
 uint8_t led_service_init(void){
+
+  RING_BUF_INIT(led, led_buf);
 
   osal_task_create(LED_TASK_ID, led_task);
   osal_start_reload_timer(LED_TASK_ID, LED_TIME_EVENT, LED_TIMEOUT_MS);
