@@ -2,11 +2,8 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-01 01:56:34
+ * @Last Modified time: 2024-08-01 22:01:14
  */
-
-#ifndef LED_SERVICE_H
-#define LED_SERVICE_H
 
 #include "osal.h"
 #include "osal_tasks.h"
@@ -66,5 +63,3 @@ uint8_t led_service_init(void){
 
   return 0;
 }
-
-#endif // LED_SERVICE_H

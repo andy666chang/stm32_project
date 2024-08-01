@@ -57,6 +57,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/osal/src/osal.c
     ../../components/ring_buf/ring_buf.c
     services/led/service.c
+    services/shell/service.c
 )
 
 # Add include paths
