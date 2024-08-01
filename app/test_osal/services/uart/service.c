@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-02 01:03:09
+ * @Last Modified time: 2024-08-02 01:54:16
  */
 
 #include <string.h>
@@ -10,12 +10,15 @@
 #include "osal.h"
 #include "osal_tasks.h"
 #include "osal_timers.h"
+#include "osal_msg.h"
 
 #include "ring_buf.h"
 
 #include "usart.h"
 
 #include "components/log/log.h"
+
+#include "services/shell/service.h"
 
 #define TAG "UART_SERIVCE"
 
@@ -53,25 +56,24 @@ static uint16_t uart_task(uint8_t id, uint16_t events)
 {
     (void)id;
 
-    static uint8_t buff[1024] = {0};
-    static uint16_t len = 0;
-
     if (events & UART_DATA_EVENT)
     {
-        while (uart_buf.cnt)
-        {
-            uint8_t data;
-            ring_buf_pop(&uart_buf, &data);
+        // check buf cnt
+        if (uart_buf.cnt) {
+            // Create message
+            uint8_t *msg = osal_msg_allocate(uart_buf.cnt+1);
 
-            buff[len++] = data;
+            // Message len
+            msg[0] = uart_buf.cnt;
 
-            if (data == '\r')
+            // put message data
+            for (size_t i = 1; uart_buf.cnt; i++)
             {
-                buff[--len] = '\0';
-                LOGI(TAG, "%s", buff);
-                memset(buff, 0, sizeof(buff));
-                len = 0;
+                ring_buf_pop(&uart_buf, &msg[i]);
             }
+
+            // send message
+            osal_msg_send(SHELL_TASK_ID ,msg);
         }
     }
 
