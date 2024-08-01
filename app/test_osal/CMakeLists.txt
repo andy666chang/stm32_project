@@ -58,7 +58,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/ring_buf/ring_buf.c
     ../../components/log/log.c
     services/led/service.c
-    services/shell/service.c
+    services/uart/service.c
 )
 
 # Add include paths

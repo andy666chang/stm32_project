@@ -30,7 +30,7 @@
 #include "components/log/log.h"
 
 #include "services/led/service.h"
-#include "services/shell/service.h"
+#include "services/uart/service.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,7 +105,7 @@ int main(void)
   osal_init_system();
 
   led_service_init();
-  shell_service_init();
+  uart_service_init();
 
   osal_start_system();
 
