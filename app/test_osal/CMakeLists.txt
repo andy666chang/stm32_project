@@ -48,7 +48,7 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-
+    Core/Src/retarget.c
     ../../components/osal/src/osal_clock.c
     ../../components/osal/src/osal_memory.c
     ../../components/osal/src/osal_msg.c
@@ -56,6 +56,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/osal/src/osal_timers.c
     ../../components/osal/src/osal.c
     ../../components/ring_buf/ring_buf.c
+    ../../components/log/log.c
     services/led/service.c
     services/shell/service.c
 )
@@ -68,6 +69,7 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ../../components/ring_buf
     components/osal
     .
+    ../../
 )
 
 # Add project symbols (macros)

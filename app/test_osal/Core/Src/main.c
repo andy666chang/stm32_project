@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -25,6 +26,8 @@
 #include "osal.h"
 #include "osal_tasks.h"
 #include "osal_timers.h"
+
+#include "components/log/log.h"
 
 #include "services/led/service.h"
 #include "services/shell/service.h"
@@ -37,7 +40,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define TAG "main"
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -91,12 +94,14 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  log_route(HAL_GetTick);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  LOGI(TAG, "OSAL Init");
   osal_init_system();
 
   led_service_init();
