@@ -2,13 +2,14 @@
  * @Author: andy.chang 
  * @Date: 2024-08-03 01:02:21 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-03 01:21:56
+ * @Last Modified time: 2024-08-03 02:09:53
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <ctype.h>
 
 #include <errno.h>
 
@@ -45,6 +46,10 @@ enum
     SHELL_RECEIVE_TILDE_EXP,
 };
 
+static char shell_buf[2][512] = {0};
+static uint16_t idx = 0;
+static uint8_t state = SHELL_RECEIVE_DEFAULT;
+
 /**
  * @brief 
  * 
@@ -59,15 +64,52 @@ static int ascii_filter(const char data)
 /**
  * @brief 
  * 
+ * @param sh 
+ * @param data 
+ */
+static void ctrl_metakeys_handle(char data)
+{
+    switch (data)
+    {
+    case SHELL_VT100_ASCII_CTRL_A: /* CTRL + A */
+    case SHELL_VT100_ASCII_CTRL_B: /* CTRL + B */
+        break;
+    case SHELL_VT100_ASCII_CTRL_C: /* CTRL + C */
+        // LOGI(TAG, "CTRL + C");
+        {
+            char shell_cmd[1024] = {0};
+
+            printf("\33[2K\r");
+            sprintf(shell_cmd, "%s%s", shell_buf[0], shell_buf[1]);
+            printf("%s%s\r\n", "mcu-cli > ", shell_cmd);
+
+            memset(shell_buf, 0, sizeof(shell_buf));
+            idx = 0;
+        }
+        break;
+
+    case SHELL_VT100_ASCII_CTRL_D: /* CTRL + D */
+    case SHELL_VT100_ASCII_CTRL_E: /* CTRL + E */
+    case SHELL_VT100_ASCII_CTRL_F: /* CTRL + F */
+    case SHELL_VT100_ASCII_CTRL_K: /* CTRL + K */
+    case SHELL_VT100_ASCII_CTRL_L: /* CTRL + L */
+    case SHELL_VT100_ASCII_CTRL_N: /* CTRL + N */
+    case SHELL_VT100_ASCII_CTRL_P: /* CTRL + P */
+    case SHELL_VT100_ASCII_CTRL_U: /* CTRL + U */
+    case SHELL_VT100_ASCII_CTRL_W: /* CTRL + W */
+    default:
+        break;
+    }
+}
+
+/**
+ * @brief 
+ * 
  * @param data 
  * @param len 
  */
 void shell_process(uint8_t *data, uint16_t len)
 {
-    static char shell_buf[2][512] = {0};
-    static uint16_t idx = 0;
-    static uint8_t state = SHELL_RECEIVE_DEFAULT;
-
     if (data == NULL)
         return;
     
@@ -125,7 +167,15 @@ void shell_process(uint8_t *data, uint16_t len)
                 break;
 
             default:
-                shell_buf[0][idx++] = data[i];
+                if (isprint(data[i]))
+                {
+                    shell_buf[0][idx++] = data[i];
+                }
+                else
+                {
+                    // LOGI(TAG, "can't print");
+                    ctrl_metakeys_handle(data[i]);
+                }
                 break;
             }
             break;
@@ -169,13 +219,13 @@ void shell_process(uint8_t *data, uint16_t len)
                 shell_buf[0][idx] = 0;
                 break;
 
-            case '3':/* DELETE Button in ESC[n~ mode */
+            case '3': /* DELETE Button in ESC[n~ mode */
                 state = SHELL_RECEIVE_TILDE_EXP;
-				if(!shell_buf[1][0])
+                if (!shell_buf[1][0])
                     continue;
-                
+
                 memmove(&shell_buf[1][0], &shell_buf[1][1], strlen(&shell_buf[1][0]));
-				break;
+                break;
             default:
                 break;
             }
@@ -183,7 +233,7 @@ void shell_process(uint8_t *data, uint16_t len)
 
         case SHELL_RECEIVE_TILDE_EXP:
         default:
-			state = SHELL_RECEIVE_DEFAULT;
+            state = SHELL_RECEIVE_DEFAULT;
             break;
         }
     }  
