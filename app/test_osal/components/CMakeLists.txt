@@ -10,6 +10,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../../components/osal/src/osal.c
     ../../../components/ring_buf/ring_buf.c
     ../../../components/log/log.c
+    ../../../components/shell/shell.c
 )
 
 # Add include paths
