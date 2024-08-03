@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-03 01:02:21 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-03 14:20:46
+ * @Last Modified time: 2024-08-03 14:48:55
  */
 
 #include <stdio.h>
@@ -46,9 +46,23 @@ enum
     SHELL_RECEIVE_TILDE_EXP,
 };
 
-static char shell_buf[512] = {0};
+#define SHELL_BUF_LEN 512
+#define SHELL_HIS_LEN 5
+
+static char shell_his[SHELL_HIS_LEN][SHELL_BUF_LEN] = {0};
+static uint16_t h_idx = 0;
+
+static char shell_buf[SHELL_BUF_LEN] = {0};
 static uint16_t idx = 0;
 static uint8_t state = SHELL_RECEIVE_DEFAULT;
+
+static void shell_history_record(char *pdata, uint16_t len)
+{
+    memmove(shell_his[1], shell_his[0], SHELL_BUF_LEN * (SHELL_HIS_LEN - 1));
+    memset(shell_his[0], 0, sizeof(shell_his[0]));
+    memcpy(shell_his[0], pdata, len);
+    h_idx = 0;
+}
 
 /**
  * @brief 
@@ -129,6 +143,11 @@ void shell_process(uint8_t *data, uint16_t len)
                 memmove(&shell_buf[idx], &shell_buf[idx+1], strlen(&shell_buf[idx+1])+1);
                 printf("%s%s\r\n", "mcu-cli > ", shell_buf);
 
+                if (strlen(shell_buf))
+                {
+                    shell_history_record(shell_buf, sizeof(shell_buf));
+                }
+
                 LOGI(TAG, "shell: %s", shell_buf);
 
                 memset(shell_buf, 0, sizeof(shell_buf));
@@ -192,10 +211,23 @@ void shell_process(uint8_t *data, uint16_t len)
             switch (data[i])
             {
             case 'A': /* UP arrow */
-                LOGI(TAG, "UP arrow");
+                memcpy(shell_buf, shell_his[h_idx], sizeof(shell_buf));
+                idx = strlen(shell_buf);
+
+                h_idx++;
+                if (h_idx >= SHELL_HIS_LEN)
+                {
+                    h_idx = SHELL_HIS_LEN - 1;
+                }
                 break;
             case 'B': /* DOWN arrow */
-                LOGI(TAG, "DOWN arrow");
+                if (h_idx)
+                {
+                    h_idx--;
+                }
+
+                memcpy(shell_buf, shell_his[h_idx], sizeof(shell_buf));
+                idx = strlen(shell_buf);
                 break;
 
             case 'C': /* RIGHT arrow */
