@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-03 01:02:21 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-03 02:09:53
+ * @Last Modified time: 2024-08-03 14:20:46
  */
 
 #include <stdio.h>
@@ -46,7 +46,7 @@ enum
     SHELL_RECEIVE_TILDE_EXP,
 };
 
-static char shell_buf[2][512] = {0};
+static char shell_buf[512] = {0};
 static uint16_t idx = 0;
 static uint8_t state = SHELL_RECEIVE_DEFAULT;
 
@@ -77,11 +77,9 @@ static void ctrl_metakeys_handle(char data)
     case SHELL_VT100_ASCII_CTRL_C: /* CTRL + C */
         // LOGI(TAG, "CTRL + C");
         {
-            char shell_cmd[1024] = {0};
-
             printf("\33[2K\r");
-            sprintf(shell_cmd, "%s%s", shell_buf[0], shell_buf[1]);
-            printf("%s%s\r\n", "mcu-cli > ", shell_cmd);
+            memmove(&shell_buf[idx], &shell_buf[idx+1], strlen(&shell_buf[idx+1])+1);
+            printf("%s%s\r\n", "mcu-cli > ", shell_buf);
 
             memset(shell_buf, 0, sizeof(shell_buf));
             idx = 0;
@@ -127,18 +125,14 @@ void shell_process(uint8_t *data, uint16_t len)
             {
                 // TODO: history
                 // TODO: execute cmd
-                char shell_cmd[1024] = {0};
-
                 printf("\33[2K\r");
+                memmove(&shell_buf[idx], &shell_buf[idx+1], strlen(&shell_buf[idx+1])+1);
+                printf("%s%s\r\n", "mcu-cli > ", shell_buf);
 
-                sprintf(shell_cmd, "%s%s", shell_buf[0], shell_buf[1]);
-
-                printf("%s%s\r\n", "mcu-cli > ", shell_cmd);
-                LOGI(TAG, "shell: %s", shell_cmd);
+                LOGI(TAG, "shell: %s", shell_buf);
 
                 memset(shell_buf, 0, sizeof(shell_buf));
                 idx = 0;
-
                 continue;
             }
 
@@ -156,20 +150,23 @@ void shell_process(uint8_t *data, uint16_t len)
                 if(idx==0)
                     continue;
 
-                shell_buf[0][--idx] = 0;
+                memmove(&shell_buf[idx], &shell_buf[idx+1], strlen(&shell_buf[idx+1])+1);
+                shell_buf[--idx] = 0;
                 break;
 
             case SHELL_VT100_ASCII_DEL: /* DELETE */
-                if(!shell_buf[1][0])
+                if(!shell_buf[idx+1])
                     continue;
                 
-                memmove(&shell_buf[1][0], &shell_buf[1][1], strlen(&shell_buf[1][0]));
+                memmove(&shell_buf[idx+1], &shell_buf[idx+2], strlen(&shell_buf[idx+2])+1);
                 break;
 
             default:
                 if (isprint(data[i]))
                 {
-                    shell_buf[0][idx++] = data[i];
+                    shell_buf[idx++] = data[i];
+                    memmove(&shell_buf[idx+1], &shell_buf[idx], strlen(&shell_buf[idx]));
+                    shell_buf[idx] = 0;
                 }
                 else
                 {
@@ -202,29 +199,27 @@ void shell_process(uint8_t *data, uint16_t len)
                 break;
 
             case 'C': /* RIGHT arrow */
-                if (!strlen(&shell_buf[1][0]))
+                if(!shell_buf[idx+1])
                     continue;
-                
-                shell_buf[0][idx++] = shell_buf[1][0];
-                memmove(&shell_buf[1][0], &shell_buf[1][1], strlen(&shell_buf[1][0]));
+
+                shell_buf[idx] = shell_buf[idx+1];
+                shell_buf[++idx] = 0;
                 break;
 
             case 'D': /* LEFT arrow */
                 if (idx == 0)
                     continue;
                 
-                idx--;
-                memmove(&shell_buf[1][1], &shell_buf[1][0], strlen(&shell_buf[1][0]));
-                shell_buf[1][0] = shell_buf[0][idx];
-                shell_buf[0][idx] = 0;
+                shell_buf[idx] = shell_buf[idx-1];
+                shell_buf[--idx] = 0;
                 break;
 
             case '3': /* DELETE Button in ESC[n~ mode */
                 state = SHELL_RECEIVE_TILDE_EXP;
-                if (!shell_buf[1][0])
+                if(!shell_buf[idx+1])
                     continue;
-
-                memmove(&shell_buf[1][0], &shell_buf[1][1], strlen(&shell_buf[1][0]));
+                
+                memmove(&shell_buf[idx+1], &shell_buf[idx+2], strlen(&shell_buf[idx+2])+1);
                 break;
             default:
                 break;
@@ -240,9 +235,9 @@ void shell_process(uint8_t *data, uint16_t len)
 
     // clear line
     printf("\33[2K\r");
-    printf("%s%s%s", "mcu-cli > ", shell_buf[0], shell_buf[1]);
+    printf("%s%s%s", "mcu-cli > ", &shell_buf[0], &shell_buf[idx+1]);
     fflush(stdout);
-    for (size_t i = 0; i < strlen(shell_buf[1]); i++)
+    for (size_t i = 0; i < strlen(&shell_buf[idx+1]); i++)
         printf("\b");
     fflush(stdout);
 }
