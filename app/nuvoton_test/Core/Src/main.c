@@ -60,7 +60,7 @@ void UART0_Init(void)
     UART_Open(UART0, 115200);
 }
 
-int32_t main(void)
+int main(void)
 {
     int32_t i32Err, i32TimeOutCnt;
 
@@ -70,7 +70,7 @@ int32_t main(void)
     /* Init UART0 for printf */
     UART0_Init();
 
-    printf("\n\nCPU @ %dHz\n", SystemCoreClock);
+    printf("\n\nCPU @ %ldHz\n", SystemCoreClock);
 
     printf("+-------------------------------------------------+\n");
     printf("|    PB.3(Output) and PC.1(Input) Sample Code     |\n");

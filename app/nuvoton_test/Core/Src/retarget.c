@@ -101,6 +101,7 @@ enum { r0, r1, r2, r3, r12, lr, pc, psr};
  */
 static void DumpStack(uint32_t stack[])
 {
+    (void) stack;
     /*
         printf("r0 =0x%x\n", stack[r0]);
         printf("r1 =0x%x\n", stack[r1]);
@@ -525,6 +526,7 @@ void _ttywrch(int ch)
  */
 int fputc(int ch, FILE *stream)
 {
+    (void) stream;
     SendChar(ch);
     return ch;
 }
@@ -538,6 +540,7 @@ int fputc(int ch, FILE *stream)
 
 int _write(int fd, char *ptr, int len)
 {
+    (void) fd;
     int i = len;
 
     while (i--)
@@ -560,6 +563,8 @@ int _write(int fd, char *ptr, int len)
 
 int _read(int fd, char *ptr, int len)
 {
+    (void) fd;
+    (void) len;
     while ((DEBUG_PORT->FIFOSTS & UART_FIFOSTS_RXEMPTY_Msk) != 0);
 
     *ptr = DEBUG_PORT->DAT;
