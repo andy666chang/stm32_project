@@ -5,6 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
+            // "armToolchainPath": "/usr/local/arm-gnu-toolchain/arm-gnu-toolchain-13.3.rel1-darwin-x86_64-arm-none-eabi/bin",
             "name": "Cortex Debug",
             "cwd": "${workspaceFolder}",
             "request": "launch",

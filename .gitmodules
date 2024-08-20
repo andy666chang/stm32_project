@@ -13,3 +13,6 @@
 [submodule "osal.git"]
 	path = components/osal
 	url = git@github.com:andy666chang/osal.git
+[submodule "M031BSP"]
+	path = sdk/M031BSP
+	url = git@github.com:OpenNuvoton/M031BSP.git
