@@ -16,3 +16,6 @@
 [submodule "M031BSP"]
 	path = sdk/M031BSP
 	url = git@github.com:OpenNuvoton/M031BSP.git
+[submodule "M480BSP"]
+	path = sdk/M480BSP
+	url = git@github.com:OpenNuvoton/M480BSP.git
