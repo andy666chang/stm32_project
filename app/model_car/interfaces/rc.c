@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-11-24 02:24:28 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-11-24 02:55:50
+ * @Last Modified time: 2024-11-24 03:14:28
  */
 
 #include <stdio.h>
@@ -47,7 +47,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
         diff -= time[0];
         if (diff < 0)
             diff += 0xffff;
-
+        btn_data_push(diff);
         break;
 
     case GPIO_PIN_12:
