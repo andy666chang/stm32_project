@@ -23,6 +23,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "services/button/service.h"
+#include "services/throttle/service.h"
 #include "components/log/log.h"
 /* USER CODE END Includes */
 
@@ -92,6 +94,7 @@ int main(void)
   log_route(HAL_GetTick);
   LOGI(TAG, "Hello JSK studio!");
   btn_servic_init();
+  thro_servic_init();
   rc_init();
   /* USER CODE END 2 */
 
@@ -100,6 +103,7 @@ int main(void)
   while (1)
   {
     btn_service_process();
+    thro_service_process();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

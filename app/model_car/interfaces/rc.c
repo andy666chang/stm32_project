@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-11-24 02:24:28 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-11-24 03:14:28
+ * @Last Modified time: 2024-11-24 13:18:28
  */
 
 #include <stdio.h>
@@ -13,6 +13,8 @@
 #include "gpio.h"
 #include "tim.h"
 
+#include "services/button/service.h"
+#include "services/throttle/service.h"
 #include "components/log/log.h"
 #define TAG "RC"
 
@@ -31,6 +33,7 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
         break;
     
     default:
+        LOGE(TAG, "Unknow GPIO EXTI: %d", GPIO_Pin);
         break;
     }
 }
@@ -38,27 +41,31 @@ void HAL_GPIO_EXTI_Rising_Callback(uint16_t GPIO_Pin){
 void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 {
     int32_t diff = __HAL_TIM_GET_COUNTER(&htim1);
+    uint16_t *time_ptr = NULL;
+    void (*func)(uint16_t) = NULL;
 
     // Measure the pulse time
-    // TODO: send signal
-    switch (GPIO_Pin)
-    {
+    switch (GPIO_Pin) {
     case GPIO_PIN_3:
-        diff -= time[0];
-        if (diff < 0)
-            diff += 0xffff;
-        btn_data_push(diff);
+        time_ptr = &time[0];
+        func = btn_data_push;
         break;
 
     case GPIO_PIN_12:
-        diff -= time[1];
-        if (diff < 0)
-            diff += 0xffff;
-        
+        time_ptr = &time[1];
+        func = thro_data_push;
         break;
 
     default:
+        LOGE(TAG, "Unknow GPIO EXTI: %d", GPIO_Pin);
         break;
+    }
+
+    if (time_ptr && func) {
+        diff -= *time_ptr;
+        if (diff < 0)
+            diff += 0xffff;
+        func(diff);
     }
 }
 
