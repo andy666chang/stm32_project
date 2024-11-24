@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-11-24 03:48:14
+ * @Last Modified time: 2024-11-24 12:07:29
  */
 
 #include <stdio.h>
@@ -18,12 +18,18 @@
 #define TAG "BTN"
 #define BTN_TIMEOUT 300
 
+#define BTN_SWITCH      1
+#define BTN_HIGH_BEAM   2
+#define BTN_CALI        6
+#define BTN_DIR         9
+
+
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
 static uint32_t time = 0; // Record time stamp for fast click
 
 void btn_data_push(uint16_t data) {
-    // TODO: count timeout
+    // count timeout
     time = log_timestamp();
     ring_buf_push(&btn_buf, (void *)&data);
 }
@@ -56,16 +62,16 @@ void btn_service_process(void) {
         
         // TODO: Send event
         switch (cnt) {
-        case 1: // Switch on/off
+        case BTN_SWITCH: // Switch on/off
             break;
 
-        case 2: // High beam
+        case BTN_HIGH_BEAM: // High beam
             break;
 
-        case 6: // Calibration
+        case BTN_CALI: // Calibration
             break;
 
-        case 9: // Switch direction
+        case BTN_DIR: // Switch direction
             break;
 
         default:
