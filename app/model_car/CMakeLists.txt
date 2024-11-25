@@ -53,6 +53,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Core/Src/retarget.c
 
     interfaces/rc.c
+    interfaces/led.c
 )
 
 # Add include paths

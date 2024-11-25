@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "interfaces/interface.h"
 #include "services/button/service.h"
 #include "services/throttle/service.h"
 #include "components/log/log.h"
@@ -95,6 +96,7 @@ int main(void)
   LOGI(TAG, "Hello JSK studio!");
   btn_servic_init();
   thro_servic_init();
+  led_init();
   rc_init();
   /* USER CODE END 2 */
 
