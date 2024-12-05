@@ -26,6 +26,7 @@
 #include "interfaces/interface.h"
 #include "services/button/service.h"
 #include "services/throttle/service.h"
+#include "services/shell/service.h"
 #include "components/log/log.h"
 /* USER CODE END Includes */
 
@@ -96,6 +97,7 @@ int main(void)
   LOGI(TAG, "Hello JSK studio!");
   btn_servic_init();
   thro_servic_init();
+  shell_servic_init();
   led_init();
   rc_init();
   /* USER CODE END 2 */
@@ -106,6 +108,7 @@ int main(void)
   {
     btn_service_process();
     thro_service_process();
+    shell_service_process();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

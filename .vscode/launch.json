@@ -14,11 +14,11 @@
             "servertype": "openocd",
             "interface": "swd",
             "configFiles": [
-                // "tools/openocd/interface/stlink.cfg",
-                "tools/openocd/interface/cmsis-dap.cfg",
-                "tools/openocd/target/stm32f1x.cfg"
+                "tools/openocd/interface/stlink.cfg",
+                // "tools/openocd/interface/cmsis-dap.cfg",
+                "tools/openocd/target/stm32g0x.cfg"
             ],
-            "executable": "build/test_osal.elf",
+            "executable": "build/model_car.elf",
             "svdFile": "tools/svd/STM32F103.svd",
 
             "rttConfig": {

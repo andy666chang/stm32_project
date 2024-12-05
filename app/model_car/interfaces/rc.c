@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-11-24 02:24:28 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-11-24 13:18:28
+ * @Last Modified time: 2024-12-05 20:52:37
  */
 
 #include <stdio.h>
@@ -44,6 +44,8 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     uint16_t *time_ptr = NULL;
     void (*func)(uint16_t) = NULL;
 
+    // LOGI(TAG, "diff = %d", diff);
+
     // Measure the pulse time
     switch (GPIO_Pin) {
     case GPIO_PIN_3:
@@ -77,6 +79,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
 int rc_init(void) {
     // Start & Reset timer
     MX_TIM1_Init();
+    HAL_TIM_Base_Start(&htim1);
 
     // Init GPIO IRQ
     HAL_NVIC_EnableIRQ(EXTI2_3_IRQn);
