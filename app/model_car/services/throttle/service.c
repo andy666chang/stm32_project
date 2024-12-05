@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-11-24 13:15:41
+ * @Last Modified time: 2024-12-05 21:04:50
  */
 
 #include "service.h"
@@ -57,6 +57,7 @@ void thro_service_process(void) {
         // TODO: check short 
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro) > margin)) {
+            LOGI(TAG, "THRO_SHORT");
             event_cap |= BIT(THRO_SHORT);
             short_timeout = log_timestamp();
         }
@@ -64,6 +65,7 @@ void thro_service_process(void) {
         // TODO: check long 
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro) < margin)) {
+            LOGI(TAG, "THRO_LONG");
             event_cap |= BIT(THRO_LONG);
             long_timeout = log_timestamp();
         }
@@ -71,6 +73,7 @@ void thro_service_process(void) {
         // TODO: check fire 
         if ((pre_thro > margin) &&
             (abs(thro) < margin)) {
+            LOGI(TAG, "THRO_FIRE");
             event_cap |= BIT(THRO_FIRE);
             fire_timeout = log_timestamp();
         }

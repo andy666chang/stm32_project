@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 20:35:21
+ * @Last Modified time: 2024-12-05 23:04:02
  */
 
 #include "service.h"
@@ -46,10 +46,10 @@ void btn_service_process(void) {
         LOGI(TAG, "Button signal: %d", data);
 
         // TODO: Diff Button state
-        if (data != pre_btn)
+        if (data != pre_btn && data == 0)
             cnt++;
         
-        // TODO: record Button state
+        // record Button state
         pre_btn = data;
     }
 
@@ -60,15 +60,19 @@ void btn_service_process(void) {
         // TODO: Send event
         switch (cnt) {
         case BTN_SWITCH: // Switch on/off
+            LOGI(TAG, "BTN_SWITCH");
             break;
 
         case BTN_HIGH_BEAM: // High beam
+            LOGI(TAG, "BTN_HIGH_BEAM");
             break;
 
         case BTN_CALI: // Calibration
+            LOGI(TAG, "BTN_CALI");
             break;
 
         case BTN_DIR: // Switch direction
+            LOGI(TAG, "BTN_DIR");
             break;
 
         default:

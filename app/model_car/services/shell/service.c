@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-05 20:26:05 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 20:54:53
+ * @Last Modified time: 2024-12-05 22:40:19
  */
 
 #include "service.h"
@@ -14,6 +14,7 @@
 #include "components/shell/shell.h"
 #include "components/log/log.h"
 
+#define TAG "SH"
 
 #define SHELL_TIMEOUT 20
 
@@ -28,6 +29,57 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
         ring_buf_push(&shell_buf, (void *)&tmp);
         HAL_UART_Receive_IT(huart, &tmp, 1);
     }
+}
+
+static int shell_led(int argc, char *argv[]) {
+    // for (size_t i = 0; i < argc; i++) {
+    //     LOGI(TAG, " led sub: %s", argv[i]);
+    // }
+
+    int n = 0, l = 0;
+
+    for (size_t i = 0; i < argc; i++) {
+        if ( !strcmp(argv[i], "-n") && (i+1) < argc) {
+            n = strtol(argv[i+1], NULL, 10);
+        }
+
+        if ( !strcmp(argv[i], "-l") && (i+1) < argc) {
+            l = strtol(argv[i+1], NULL, 10);
+        } 
+    }
+
+    LOGI(TAG,"n: %d, l:%d",n ,l);
+
+    for (size_t i = 0; i < l; i++){
+        btn_data_push(100);
+        btn_data_push(0);
+    }
+
+
+    return 0;
+}
+
+int parse_shell(uint8_t *shell, uint32_t len) {
+    (void) len;
+
+    int argc = 0;
+    char *argv[20] = {NULL};
+
+    // parse shell
+    argv[argc] = strtok(shell, " ");
+    
+    while(argv[argc] != NULL) {
+        argc++;
+        argv[argc] = strtok(NULL, " ");
+    }
+
+
+    // check shell keyword
+    if ( !strcasecmp(argv[0], "led")) {
+        shell_led(argc-1, argv+1);
+    }
+    
+    return 0;
 }
 
 

@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-03 01:02:21 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-08-03 14:48:55
+ * @Last Modified time: 2024-12-05 21:22:48
  */
 
 #include <stdio.h>
@@ -149,6 +149,7 @@ void shell_process(uint8_t *data, uint16_t len)
                 }
 
                 LOGI(TAG, "shell: %s", shell_buf);
+                parse_shell(shell_buf, sizeof(shell_buf));
 
                 memset(shell_buf, 0, sizeof(shell_buf));
                 idx = 0;
