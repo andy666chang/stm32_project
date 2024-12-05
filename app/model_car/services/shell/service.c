@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-05 20:26:05 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 22:40:19
+ * @Last Modified time: 2024-12-05 23:26:26
  */
 
 #include "service.h"
@@ -23,6 +23,24 @@ static uint8_t tmp;
 static uint16_t shell_buf_data[10];
 static struct ring_buf shell_buf;
 
+struct _shell_func_ {
+    char *func_name;
+    char *func_info;
+    int (*func)(int argc, char *argv[]);
+    struct _shell_func_ *sub_cli ;
+};
+
+static int shell_led(int argc, char *argv[]);
+static int shell_btn(int argc, char *argv[]);
+static int shell_thro(int argc, char *argv[]);
+
+
+struct _shell_func_ shell_func_list[] = {
+    // { "led", NULL, shell_led, NULL},
+    { "btn", NULL, shell_btn, NULL},
+    { "thro", NULL, shell_thro, NULL},
+};
+
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart == &huart1) {
@@ -31,30 +49,44 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
     }
 }
 
-static int shell_led(int argc, char *argv[]) {
+static int shell_btn(int argc, char *argv[]) {
     // for (size_t i = 0; i < argc; i++) {
     //     LOGI(TAG, " led sub: %s", argv[i]);
     // }
 
-    int n = 0, l = 0;
+    int p = 0;
 
     for (size_t i = 0; i < argc; i++) {
-        if ( !strcmp(argv[i], "-n") && (i+1) < argc) {
-            n = strtol(argv[i+1], NULL, 10);
+        if ( !strcmp(argv[i], "-p") && (i+1) < argc) {
+            p = strtol(argv[i+1], NULL, 10);
         }
-
-        if ( !strcmp(argv[i], "-l") && (i+1) < argc) {
-            l = strtol(argv[i+1], NULL, 10);
-        } 
     }
 
-    LOGI(TAG,"n: %d, l:%d",n ,l);
+    LOGI(TAG,"press: %d",p );
 
-    for (size_t i = 0; i < l; i++){
+    for (size_t i = 0; i < p; i++){
         btn_data_push(100);
         btn_data_push(0);
     }
 
+    return 0;
+}
+
+static int shell_thro(int argc, char *argv[]) {
+    // for (size_t i = 0; i < argc; i++) {
+    //     LOGI(TAG, " led sub: %s", argv[i]);
+    // }
+
+    int thro = 0;
+
+    for (size_t i = 0; i < argc; i++) {
+        if ( !strcmp(argv[i], "-v") && (i+1) < argc) {
+            thro = strtol(argv[i+1], NULL, 10);
+        }
+    }
+
+    LOGI(TAG,"thro: %d", thro);
+    thro_data_push(thro);
 
     return 0;
 }
@@ -75,8 +107,13 @@ int parse_shell(uint8_t *shell, uint32_t len) {
 
 
     // check shell keyword
-    if ( !strcasecmp(argv[0], "led")) {
-        shell_led(argc-1, argv+1);
+    for (size_t i = 0; i < ARRAY_SIZE(shell_func_list); i++){
+        if ( !strcasecmp(argv[0], shell_func_list[i].func_name)) {
+            if (shell_func_list[i].func) {
+                shell_func_list[i].func(argc-1, argv+1);
+            }
+            break;
+        }
     }
     
     return 0;
