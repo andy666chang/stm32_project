@@ -1,4 +1,5 @@
 
+add_subdirectory(mcuboot)
 add_subdirectory(tinycrypt)
 
 # Add sources to executable

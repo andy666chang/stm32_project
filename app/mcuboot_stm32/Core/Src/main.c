@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <bootutil/bootutil.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,6 +89,13 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+  struct boot_rsp rsp;
+  int rv = boot_go(&rsp);
+
+  if (rv == 0) {
+    // 'rsp' contains the start address of the image
+    // your_platform_do_boot(&rsp);
+  }
 
   /* USER CODE END 2 */
 
