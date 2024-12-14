@@ -16,3 +16,6 @@
 [submodule "M031BSP"]
 	path = sdk/M031BSP
 	url = git@github.com:OpenNuvoton/M031BSP.git
+[submodule "components/mcuboot"]
+	path = components/mcuboot
+	url = https://github.com/mcu-tools/mcuboot.git
