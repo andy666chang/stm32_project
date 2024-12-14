@@ -19,3 +19,6 @@
 [submodule "components/mcuboot"]
 	path = components/mcuboot
 	url = https://github.com/mcu-tools/mcuboot.git
+[submodule "components/tinycrypt"]
+	path = components/tinycrypt
+	url = https://github.com/intel/tinycrypt.git
