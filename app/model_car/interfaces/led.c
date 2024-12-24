@@ -19,8 +19,19 @@
  * @param en 
  */
 void led_head_set(uint8_t id, bool en) {
-    (void) id;
-    (void) en;
+    switch (id) {
+    case 0:
+        HAL_GPIO_WritePin(HEAD_0_GPIO_Port, HEAD_0_Pin, en);
+        break;
+    
+    case 1:
+        HAL_GPIO_WritePin(HEAD_1_GPIO_Port, HEAD_1_Pin, en);
+        break;
+    
+    default:
+        LOGE(TAG,"Unknow id: %d", id);
+        break;
+    }
 }
 
 /**
@@ -43,8 +54,19 @@ bool led_head_get(uint8_t id) {
  * @param en 
  */
 void led_tail_set(uint8_t id, bool en) {
-    (void) id;
-    (void) en;
+    switch (id) {
+    case 0:
+        HAL_GPIO_WritePin(TAIL_0_GPIO_Port, TAIL_0_Pin, en);
+        break;
+    
+    case 1:
+        HAL_GPIO_WritePin(TAIL_1_GPIO_Port, TAIL_1_Pin, en);
+        break;
+    
+    default:
+        LOGE(TAG,"Unknow id: %d", id);
+        break;
+    }
 }
 
 /**
@@ -66,7 +88,7 @@ bool led_tail_get(uint8_t id) {
  * @param en 
  */
 void led_chasis_set(bool en) {
-    (void) en;
+    HAL_GPIO_WritePin(CHASIS_GPIO_Port, CHASIS_Pin, en);
 }
 
 /**
@@ -85,7 +107,7 @@ bool led_chasis_get(void) {
  * @param en 
  */
 void led_fire_set(bool en) {
-    (void) en;
+    HAL_GPIO_WritePin(FIRE_GPIO_Port, FIRE_Pin, en);
 }
 
 /**
