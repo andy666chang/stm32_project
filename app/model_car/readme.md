@@ -1,5 +1,16 @@
 # Model Car
 
+## Build
+
+```shell
+cmake ../app/model_car -G Ninja
+
+ninja -j16
+
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "program build/model_car.elf verify reset exit"
+
+pyocd reset
+```
 
 ## Code flow
 
