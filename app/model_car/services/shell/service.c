@@ -36,7 +36,7 @@ static int shell_thro(int argc, char *argv[]);
 
 
 struct _shell_func_ shell_func_list[] = {
-    // { "led", NULL, shell_led, NULL},
+    { "led", NULL, shell_led, NULL},
     { "btn", NULL, shell_btn, NULL},
     { "thro", NULL, shell_thro, NULL},
 };
@@ -87,6 +87,66 @@ static int shell_thro(int argc, char *argv[]) {
 
     LOGI(TAG,"thro: %d", thro);
     thro_data_push(thro);
+
+    return 0;
+}
+
+static int shell_led(int argc, char *argv[]) {
+    // for (size_t i = 0; i < argc; i++) {
+    //     LOGI(TAG, " led sub: %s", argv[i]);
+    // }
+
+    int idx = 99, level = 99;
+
+    for (size_t i = 0; i < argc; i++) {
+        if ( !strcmp(argv[i], "-i") && (i+1) < argc) {
+            idx = strtol(argv[i+1], NULL, 10);
+            continue;
+        }
+
+        if ( !strcmp(argv[i], "-l") && (i+1) < argc) {
+            level = (bool)strtol(argv[i+1], NULL, 10);
+            continue;
+        }
+    }
+
+    LOGI(TAG,"idx: %d, level: %d", idx, level);
+
+    switch (idx) {
+        case 0:
+            LOGI(TAG, "HEAD_0_Pin level: %d", level);
+            led_head_set(0, level);
+            break;
+        
+        case 1:
+            LOGI(TAG, "HEAD_1_Pin level: %d", level);
+            led_head_set(1, level);
+            break;
+
+        case 2:
+            LOGI(TAG, "CHASIS_Pin level: %d", level);
+            led_chasis_set(level);
+            break;
+
+        case 3:
+            LOGI(TAG, "TAIL_0_Pin level: %d", level);
+            led_tail_set(0, level);
+            break;
+
+        case 4:
+            LOGI(TAG, "TAIL_1_Pin level: %d", level);
+            led_tail_set(1, level);
+            break;
+
+        case 5:
+            LOGI(TAG, "FIRE_Pin level: %d", level);
+            led_fire_set(level);
+            break;
+        
+        default:
+            LOGE(TAG,"Unknow LED: %d", idx);
+            break;
+    }
 
     return 0;
 }

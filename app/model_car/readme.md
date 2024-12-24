@@ -12,6 +12,16 @@ openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0
 pyocd reset
 ```
 
+## CMD
+
+```
+led -i <0...5> -l <0...1>
+
+btn -p <1...9>
+
+thro -v <0...100>
+```
+
 ## Code flow
 
 - Button
