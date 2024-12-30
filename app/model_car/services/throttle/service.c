@@ -9,6 +9,8 @@
 
 #include "gpio.h"
 
+#include "interfaces/interface.h"
+
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
 
@@ -24,11 +26,16 @@
 
 #define BIT(n) (UINT32_C(1) << (n))
 
+#define ON 1
+#define OFF 0
+
 int16_t centor = 1500; // 1000 ~ 2000 us
 static const uint16_t margin = 10; // 10us
 static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 static uint32_t time = 0; // Record time stamp
+
+extern uint8_t sw_state;
 
 void thro_data_push(uint16_t data) {
     // count timeout
@@ -86,10 +93,15 @@ void thro_service_process(void) {
     /* Check throttle event */
     // short 
     if (event_cap & BIT(THRO_SHORT)) {
-        // TODO: turn on tail led
+        // turn on tail led
+        led_tail_set(0, ON);
+        led_tail_set(1, ON);
 
         if ( (log_timestamp() - short_timeout) > THRO_SHORT_TIMEOUT ) {
-            // TODO: turn off tail led
+            // turn off tail led
+            if (sw_state == 0)
+                led_tail_set(0, OFF);
+            led_tail_set(1, OFF);
             
             // Clear event
             event_cap &= ~(BIT(THRO_SHORT));
@@ -98,10 +110,15 @@ void thro_service_process(void) {
 
     // long
     if (event_cap & BIT(THRO_LONG)) {
-        // TODO: turn on tail led
+        // turn on tail led
+        led_tail_set(0, ON);
+        led_tail_set(1, ON);
 
         if ( (log_timestamp() - long_timeout) > THRO_LONG_TIMEOUT ) {
-            // TODO: turn off tail led
+            // turn off tail led
+            if (sw_state == 0)
+                led_tail_set(0, OFF);
+            led_tail_set(1, OFF);
             
             // Clear event
             event_cap &= ~(BIT(THRO_LONG));
@@ -110,10 +127,12 @@ void thro_service_process(void) {
 
     // fire
     if (event_cap & BIT(THRO_FIRE)) {
-        // TODO: turn on fire led
+        // turn on fire led
+        led_fire_set(ON);
 
         if ( (log_timestamp() - fire_timeout) > THRO_FIRE_TIMEOUT ) {
-            // TODO: turn off fire led
+            // turn off fire led
+            led_fire_set(OFF);
             
             // Clear event
             event_cap &= ~(BIT(THRO_FIRE));

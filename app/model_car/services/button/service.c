@@ -35,7 +35,7 @@ void btn_data_push(uint16_t data) {
     ring_buf_push(&btn_buf, (void *)&data);
 }
 
-static uint8_t sw_state = 0;
+uint8_t sw_state = 0;
 static bool beam_state = 0;
 
 static void btn_switch(void) {
@@ -47,7 +47,6 @@ static void btn_switch(void) {
     case 0:
         led_chasis_set(OFF);
         led_tail_set(0, OFF);
-        led_tail_set(1, OFF);
         break;
 
     case 1:
