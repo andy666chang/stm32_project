@@ -9,6 +9,8 @@
 
 #include "gpio.h"
 
+#include "interfaces/interface.h"
+
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
 
@@ -20,6 +22,8 @@
 #define BTN_CALI        6
 #define BTN_DIR         9
 
+#define ON 1
+#define OFF 0
 
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
@@ -29,6 +33,63 @@ void btn_data_push(uint16_t data) {
     // count timeout
     time = log_timestamp();
     ring_buf_push(&btn_buf, (void *)&data);
+}
+
+static uint8_t sw_state = 0;
+static bool beam_state = 0;
+
+static void btn_switch(void) {
+    sw_state++;
+    sw_state %= 4;
+    LOGI(TAG, "%s state: %d", __FUNCTION__, sw_state);
+
+    switch (sw_state) {
+    case 0:
+        led_chasis_set(OFF);
+        led_tail_set(0, OFF);
+        led_tail_set(1, OFF);
+        break;
+
+    case 1:
+        led_chasis_set(ON);
+        led_tail_set(0, ON);
+        break;
+
+    case 2:
+        led_chasis_set(ON);
+        led_tail_set(0, ON);
+        led_head_set(0, ON);
+        break;
+
+    case 3:
+        led_chasis_set(ON);
+        led_tail_set(0, ON);
+        led_head_set(0, OFF);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+static void btn_high_beam(void) {
+    beam_state = !beam_state;
+    LOGI(TAG, "%s beam: %d", __FUNCTION__, beam_state);
+
+    if (beam_state) {
+        // turn on high beam
+        led_head_set(1, ON);
+        led_head_set(0, ON);
+    } else {
+        // turn off high beam
+        led_head_set(1, OFF);
+
+        // Keep btn switch status
+        if (sw_state == 2)
+            led_head_set(0, ON);
+        else
+            led_head_set(0, OFF);
+    }
 }
 
 /**
@@ -61,10 +122,12 @@ void btn_service_process(void) {
         switch (cnt) {
         case BTN_SWITCH: // Switch on/off
             LOGI(TAG, "BTN_SWITCH");
+            btn_switch();
             break;
 
         case BTN_HIGH_BEAM: // High beam
             LOGI(TAG, "BTN_HIGH_BEAM");
+            btn_high_beam();
             break;
 
         case BTN_CALI: // Calibration
