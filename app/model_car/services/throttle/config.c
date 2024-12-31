@@ -5,8 +5,6 @@
  * @Last Modified time: 2024-12-31 13:18:33
  */
 
-#pragma once
-
 #include "config.h"
 
 #include "interfaces/interface.h"

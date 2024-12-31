@@ -5,6 +5,12 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     ../../../components/ring_buf/ring_buf.c
     ../../../components/log/log.c
     ../../../components/shell/shell.c
+
+    shell/shell.c
+    shell/shell_sys.c
+    shell/shell_led.c
+    shell/shell_btn.c
+    shell/shell_thro.c
 )
 
 # Add include paths
