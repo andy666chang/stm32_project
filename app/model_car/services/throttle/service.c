@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 21:04:50
+ * @Last Modified time: 2024-12-31 11:24:32
  */
 
 #include "service.h"
@@ -150,6 +150,8 @@ void thro_service_process(void) {
 int thro_servic_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(thro_buf, thro_buf_data);
+
+    config_init();
 
     return 0;
 }

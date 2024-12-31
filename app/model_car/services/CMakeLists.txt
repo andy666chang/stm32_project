@@ -4,6 +4,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     button/service.c
     throttle/service.c
     shell/service.c
+
+    throttle/config.c
 )
 
 # Add include paths

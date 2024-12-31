@@ -20,7 +20,7 @@
 
 static uint8_t tmp;
 
-static uint16_t shell_buf_data[10];
+static uint16_t shell_buf_data[32];
 static struct ring_buf shell_buf;
 
 struct _shell_func_ {
