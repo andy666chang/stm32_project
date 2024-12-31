@@ -19,6 +19,9 @@
 #define TAG "SHELL-CFG"
 
 static int shell_dump(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
     // Dump config
     LOGI(TAG, "prj_cfg:");
     LOGI(TAG, "  version = %d", prj_cfg->version);
@@ -29,16 +32,24 @@ static int shell_dump(int argc, char *argv[]) {
 }
 
 static int shell_load(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
     load_config();
     return 0;
 }
 
 static int shell_save(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
     save_config();
     return 0;
 }
 
 static int shell_dir(int argc, char *argv[]) {
+    (void) argc;
+
     int8_t dir = strtol(argv[0], NULL, 10);
     prj_cfg->centor = dir;
     LOGI(TAG, "dir = %d", prj_cfg->dir);
@@ -46,6 +57,8 @@ static int shell_dir(int argc, char *argv[]) {
 }
 
 static int shell_center(int argc, char *argv[]) {
+    (void) argc;
+
     uint16_t num = strtol(argv[0], NULL, 10);
     prj_cfg->centor = num;
     LOGI(TAG, "centor = %d", prj_cfg->centor);
@@ -53,6 +66,8 @@ static int shell_center(int argc, char *argv[]) {
 }
 
 static int shell_margin(int argc, char *argv[]) {
+    (void) argc;
+
     uint16_t num = strtol(argv[0], NULL, 10);
     prj_cfg->margin = num;
     LOGI(TAG, "margin = %d", prj_cfg->margin);

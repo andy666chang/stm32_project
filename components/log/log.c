@@ -21,6 +21,7 @@ uint32_t log_timestamp() {
 
 void log_write(log_level_t level, const char *tag, const char *format,
                   ...) {
+    (void) tag;
     if (g_log_level >= level) {
         va_list arg;
         va_start(arg, format);

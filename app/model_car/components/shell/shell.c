@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
@@ -48,6 +49,9 @@ static void shell_dump(struct shell_t shell_list[]) {
 }
 
 static int shell_help(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
     shell_dump(shell_func_list);
     return 0;
 }
@@ -76,7 +80,7 @@ int parse_shell(uint8_t *shell, uint32_t len) {
     char *argv[20] = {NULL};
 
     // parse shell
-    argv[argc] = strtok(shell, " ");
+    argv[argc] = strtok((char *)shell, " ");
     
     while(argv[argc] != NULL) {
         argc++;

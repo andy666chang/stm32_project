@@ -11,11 +11,17 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "main.h"
+
 #include "components/log/log.h"
 
 #define TAG "SHELL-SYS"
 
 static int shell_reboot(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
     HAL_NVIC_SystemReset();
     return 0;
 }

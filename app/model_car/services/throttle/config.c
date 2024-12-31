@@ -67,7 +67,7 @@ void config_init(void) {
 }
 
 void load_config(void) {
-    flash_read(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
+    flash_read(CFG_ADDR, (uint8_t *)&cfg_pack, sizeof(cfg_pack_t));
 }
 
 void save_config(void) {
@@ -76,5 +76,5 @@ void save_config(void) {
 
     // Erase and write to flash
     flash_erase(CFG_ADDR, sizeof(cfg_pack_t));
-    flash_write(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
+    flash_write(CFG_ADDR, (uint8_t *)&cfg_pack, sizeof(cfg_pack_t));
 }

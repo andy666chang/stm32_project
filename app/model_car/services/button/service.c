@@ -41,7 +41,7 @@ static bool beam_state = 0;
 static void btn_switch(void) {
     sw_state++;
     sw_state %= 4;
-    LOGI(TAG, "%s state: %d", __FUNCTION__, sw_state);
+    LOGI(TAG, "%s state: %d", __func__, sw_state);
 
     switch (sw_state) {
     case 0:
@@ -73,7 +73,7 @@ static void btn_switch(void) {
 
 static void btn_high_beam(void) {
     beam_state = !beam_state;
-    LOGI(TAG, "%s beam: %d", __FUNCTION__, beam_state);
+    LOGI(TAG, "%s beam: %d", __func__, beam_state);
 
     if (beam_state) {
         // turn on high beam

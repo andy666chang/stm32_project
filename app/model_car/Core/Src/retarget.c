@@ -10,6 +10,7 @@ extern UART_HandleTypeDef PORT;
 #if defined(__GNUC__)
 int _write(int fd, char * ptr, int len)
 {
+  (void) fd;
   HAL_UART_Transmit(&PORT, (uint8_t *) ptr, len, HAL_MAX_DELAY);
   return len;
 }

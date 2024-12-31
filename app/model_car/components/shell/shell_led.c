@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -25,7 +26,7 @@ int shell_led(int argc, char *argv[]) {
 
     int idx = 99, level = 99;
 
-    for (size_t i = 0; i < argc; i++) {
+    for (int i = 0; i < argc; i++) {
         if ( !strcmp(argv[i], "-i") && (i+1) < argc) {
             idx = strtol(argv[i+1], NULL, 10);
             continue;
