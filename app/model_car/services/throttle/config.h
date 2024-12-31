@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 11:18:34
+ * @Last Modified time: 2024-12-31 13:14:52
  */
 
 #pragma once
@@ -22,3 +22,6 @@ typedef struct prj_cfg_t {
 } prj_cfg_t;
 
 extern prj_cfg_t *prj_cfg;
+
+void load_config(void);
+void save_config(void);

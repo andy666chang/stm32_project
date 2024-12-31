@@ -2,10 +2,11 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 11:24:32
+ * @Last Modified time: 2024-12-31 13:15:02
  */
 
 #include "service.h"
+#include "config.h"
 
 #include "gpio.h"
 
@@ -33,13 +34,10 @@ int16_t centor = 1500; // 1000 ~ 2000 us
 static const uint16_t margin = 10; // 10us
 static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
-static uint32_t time = 0; // Record time stamp
 
 extern uint8_t sw_state;
 
 void thro_data_push(uint16_t data) {
-    // count timeout
-    time = log_timestamp();
     ring_buf_push(&thro_buf, (void *)&data);
 }
 
@@ -151,7 +149,7 @@ int thro_servic_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(thro_buf, thro_buf_data);
 
-    config_init();
+    load_config();
 
     return 0;
 }
