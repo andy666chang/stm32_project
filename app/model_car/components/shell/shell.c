@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 14:45:02 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 15:42:13
+ * @Last Modified time: 2024-12-31 16:52:24
  */
 
 #include <stdio.h>
@@ -16,6 +16,7 @@
 #include "shell_led.h"
 #include "shell_btn.h"
 #include "shell_thro.h"
+#include "shell_config.h"
 
 #include "components/log/log.h"
 
@@ -29,19 +30,20 @@ struct shell_t shell_func_list[] = {
     SHELL_LED,
     SHELL_BTN,
     SHELL_THRO,
+    SHELL_CFG,
     SHELL_END,
 };
 
 
 static void shell_dump(struct shell_t shell_list[]) {
     for (size_t i = 0; shell_list[i].func_name != NULL; i++) {
-        LOGI(TAG, "%s - %s", shell_list[i].func_name, shell_list[i].func_info);
-        
         if (shell_list[i].sub_shell) {
+            LOGI(TAG, "%s: %s", shell_list[i].func_name, shell_list[i].func_info);
             shell_dump(shell_list[i].sub_shell);
+            LOGI(TAG, "");
+        } else {
+            LOGI(TAG, "%s - %s", shell_list[i].func_name, shell_list[i].func_info);
         }
-
-        LOGI(TAG, "");
     }
 }
 

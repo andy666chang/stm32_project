@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 13:18:33
+ * @Last Modified time: 2024-12-31 16:07:17
  */
 
 #include "config.h"
@@ -36,12 +36,12 @@ static const prj_cfg_t default_cfg = {
 static cfg_pack_t cfg_pack = {.check = 0x55};
 prj_cfg_t *prj_cfg = NULL;
 
-void load_config(void) {
+void config_init(void) {
     // LOGI(TAG, "size of prj_cfg: %d", sizeof(prj_cfg_t)); // 6
     // LOGI(TAG, "size of cfg_pack: %d", sizeof(cfg_pack_t)); // 256
 
     // Read config pack from flash
-    flash_read(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
+    load_config();
     LOGI(TAG, "cfg_pack.check: 0x%08X", cfg_pack.check);
 
     // TODO: verify data valid with CRC32
@@ -64,6 +64,10 @@ void load_config(void) {
     LOGI(TAG, "  dir = %d", prj_cfg->dir);
     LOGI(TAG, "  centor = %d", prj_cfg->centor);
     LOGI(TAG, "  margin = %d\n", prj_cfg->margin);
+}
+
+void load_config(void) {
+    flash_read(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
 }
 
 void save_config(void) {
