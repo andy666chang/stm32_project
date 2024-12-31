@@ -2,16 +2,20 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 11:28:47
+ * @Last Modified time: 2024-12-31 13:04:23
  */
 
 #pragma once
 
 #include "config.h"
 
+#include "interfaces/interface.h"
+
 #include "components/log/log.h"
 
 #define TAG "CFG"
+
+#define CFG_ADDR 0x0800F000
 
 typedef struct cfg_pack_t {
     union pack_t {
@@ -37,14 +41,20 @@ void config_init(void) {
     // LOGI(TAG, "size of prj_cfg: %d", sizeof(prj_cfg_t)); // 6
     // LOGI(TAG, "size of cfg_pack: %d", sizeof(cfg_pack_t)); // 256
 
-    // TODO: read config pack from flash
+    // Read config pack from flash
+    flash_read(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
+    LOGI(TAG, "cfg_pack.check: 0x%08x", cfg_pack.check);
 
     // TODO: verify data valid with CRC32
-    if (cfg_pack.check == 0x55) {
+    if (cfg_pack.check != 0x01234567) {
         // Replace by default config
         LOGW(TAG, "Invalid data in flash, reset to default");
         memcpy(&cfg_pack.pack.cfg, &default_cfg, sizeof(prj_cfg_t));
-        // TODO: write to flash
+        cfg_pack.check = 0x01234567;
+
+        // Erase and write to flash
+        flash_erase(CFG_ADDR, sizeof(cfg_pack_t));
+        flash_write(CFG_ADDR, &cfg_pack, sizeof(cfg_pack_t));
     }
     
     // Load to global config

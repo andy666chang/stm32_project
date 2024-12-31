@@ -16,3 +16,7 @@ bool led_fire_get(void);
 
 int led_init(void);
 int rc_init(void);
+
+int flash_erase(uint32_t addr, uint32_t len);
+int flash_write(uint32_t addr, uint8_t *data, uint32_t len);
+int flash_read(uint32_t addr, uint8_t *data, uint32_t len);
