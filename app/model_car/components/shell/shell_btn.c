@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 15:01:03 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 15:19:55
+ * @Last Modified time: 2025-01-02 17:22:09
  */
 
 #include "shell_btn.h"
@@ -35,8 +35,11 @@ int shell_btn(int argc, char *argv[]) {
     LOGI(TAG,"press: %d",p );
 
     for (int i = 0; i < p; i++){
-        btn_data_push(100);
-        btn_data_push(0);
+        static uint16_t btn = 2000;
+        
+        btn_data_push(btn);
+
+        btn = (btn == 2000)? 1000:2000;
     }
 
     return 0;
