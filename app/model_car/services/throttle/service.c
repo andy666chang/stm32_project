@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:36:27
+ * @Last Modified time: 2025-01-02 16:51:04
  */
 
 #include "service.h"
@@ -36,6 +36,7 @@ static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
 extern uint8_t sw_state;
+extern uint8_t cali_state;
 
 void thro_data_push(uint16_t data) {
     ring_buf_push(&thro_buf, (void *)&data);
@@ -54,6 +55,11 @@ void thro_service_process(void) {
     while (thro_buf.cnt) {
         uint16_t data = 0;
         ring_buf_pop(&thro_buf, (void *)&data);
+
+        if (cali_state) {
+            prj_cfg->center = data;
+            break;
+        }
 
         thro = data - prj_cfg->center;
         thro *= prj_cfg->dir;

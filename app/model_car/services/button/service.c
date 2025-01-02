@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:36:09
+ * @Last Modified time: 2025-01-02 17:08:49
  */
 
 #include "service.h"
@@ -18,9 +18,13 @@
 
 #define TAG "BTN"
 #define BTN_TIMEOUT 300
+#define FLASH_TIMEOUT 500
+#define CALI_TIMEOUT 1500
+
 
 #define BTN_SWITCH      1
 #define BTN_HIGH_BEAM   2
+#define BTN_FALSH       3
 #define BTN_CALI        6
 #define BTN_DIR         9
 
@@ -32,13 +36,17 @@
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
 static uint32_t time = 0; // Record time stamp for fast click
+static uint32_t cali_time = 0; // Record time stamp for calibration
 
 void btn_data_push(uint16_t data) {
     ring_buf_push(&btn_buf, (void *)&data);
 }
 
 uint8_t sw_state = 0;
+uint8_t cali_state = 0;
 static bool beam_state = 0;
+
+static void (*sub_process)(void) = NULL;
 
 static void btn_switch(void) {
     sw_state++;
@@ -93,6 +101,24 @@ static void btn_high_beam(void) {
     }
 }
 
+static void btn_led_flash(void) {
+    static uint32_t flash_time = 0;
+    if ((log_timestamp() - flash_time) >= FLASH_TIMEOUT) {
+        led_chasis_set(!led_chasis_get());
+        flash_time = log_timestamp();
+    }
+}
+
+static void btn_cali(void) {
+    if ((log_timestamp() - cali_time) >= CALI_TIMEOUT) {
+        LOGI(TAG, "center = %d", prj_cfg->center);
+        LOGI(TAG, "BTN_CALI finish");
+        save_config();
+        cali_state = 0;
+        sub_process = NULL;
+    }
+}
+
 /**
  * @brief 
  * 
@@ -126,8 +152,9 @@ void btn_service_process(void) {
     // Count timeout
     if ((log_timestamp() - time) >= BTN_TIMEOUT &&
         cnt) {
+        LOGI(TAG, "BTN cnt: %d", cnt);
         
-        // TODO: Send event
+        // Send event
         switch (cnt) {
         case BTN_SWITCH: // Switch on/off
             LOGI(TAG, "BTN_SWITCH");
@@ -139,8 +166,21 @@ void btn_service_process(void) {
             btn_high_beam();
             break;
 
+        case BTN_FALSH: // LED Flash
+            LOGI(TAG, "BTN_FLASH");
+            if (sub_process == btn_led_flash) {
+                led_chasis_set(OFF);
+                sub_process = NULL;
+            } else if (sub_process == NULL) {
+                sub_process = btn_led_flash;
+            }
+            break;
+
         case BTN_CALI: // Calibration
             LOGI(TAG, "BTN_CALI");
+            cali_state = 1;
+            cali_time = log_timestamp();
+            sub_process = btn_cali;
             break;
 
         case BTN_DIR: // Switch direction
@@ -155,6 +195,10 @@ void btn_service_process(void) {
         }
 
         cnt = 0;
+    }
+
+    if (sub_process) {
+        sub_process();
     }
     
     return;
