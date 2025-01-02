@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 17:08:49
+ * @Last Modified time: 2025-01-02 23:50:16
  */
 
 #include "service.h"
@@ -103,8 +103,10 @@ static void btn_high_beam(void) {
 
 static void btn_led_flash(void) {
     static uint32_t flash_time = 0;
+    static bool led_state = 0;
     if ((log_timestamp() - flash_time) >= FLASH_TIMEOUT) {
-        led_chasis_set(!led_chasis_get());
+        led_chasis_set(led_state);
+        led_state = !led_state;
         flash_time = log_timestamp();
     }
 }
