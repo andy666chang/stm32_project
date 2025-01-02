@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 16:07:47
+ * @Last Modified time: 2025-01-02 16:17:44
  */
 
 #include "service.h"
@@ -31,7 +31,7 @@
 #define OFF 0
 
 int16_t centor = 1500; // 1000 ~ 2000 us
-static const uint16_t margin = 10; // 10us
+static const uint16_t margin = 20; // 10us
 static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
@@ -57,25 +57,27 @@ void thro_service_process(void) {
 
         thro = data - centor;
 
-        LOGI(TAG, "Throttle signal: %d", data);
+        LOGD(TAG, "Throttle signal: %d", thro); // 1500 +- 544 in each 15ms
 
-        // TODO: check short 
+        // Check short 
         if ((abs(thro) < abs(pre_thro)) &&
+            (abs(thro-pre_thro) > margin) &&
             (abs(thro) > margin)) {
             LOGI(TAG, "THRO_SHORT");
             event_cap |= BIT(THRO_SHORT);
             short_timeout = log_timestamp();
         }
 
-        // TODO: check long 
+        // Check long 
         if ((abs(thro) < abs(pre_thro)) &&
+            (abs(thro-pre_thro) > margin) &&
             (abs(thro) < margin)) {
             LOGI(TAG, "THRO_LONG");
             event_cap |= BIT(THRO_LONG);
             long_timeout = log_timestamp();
         }
 
-        // TODO: check fire 
+        // Check fire 
         if ((pre_thro > margin) &&
             (abs(thro) < margin)) {
             LOGI(TAG, "THRO_FIRE");

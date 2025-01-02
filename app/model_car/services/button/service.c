@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 23:04:02
+ * @Last Modified time: 2025-01-02 16:21:06
  */
 
 #include "service.h"
@@ -30,8 +30,6 @@ static struct ring_buf btn_buf;
 static uint32_t time = 0; // Record time stamp for fast click
 
 void btn_data_push(uint16_t data) {
-    // count timeout
-    time = log_timestamp();
     ring_buf_push(&btn_buf, (void *)&data);
 }
 
@@ -96,18 +94,26 @@ static void btn_high_beam(void) {
  * 
  */
 void btn_service_process(void) {
-    static uint16_t pre_btn = 0;
+    static uint16_t pre_btn = 2000;
     static uint8_t cnt = 0;
 
     while (btn_buf.cnt) {
         uint16_t data = 0;
         ring_buf_pop(&btn_buf, (void *)&data);
 
-        LOGI(TAG, "Button signal: %d", data);
+        LOGD(TAG, "Button signal: %d", data); // 978 or 2045 in each 15ms
+        if (data >= 1500) {
+            data = 2000;
+        } else {
+            data = 1000;
+        }
 
-        // TODO: Diff Button state
-        if (data != pre_btn && data == 0)
+        // Diff Button state
+        if (data != pre_btn) {
+            // count timeout
+            time = log_timestamp();
             cnt++;
+        }
         
         // record Button state
         pre_btn = data;
