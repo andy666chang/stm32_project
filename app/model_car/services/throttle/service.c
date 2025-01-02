@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:17:44
+ * @Last Modified time: 2025-01-02 16:36:27
  */
 
 #include "service.h"
@@ -30,8 +30,8 @@
 #define ON 1
 #define OFF 0
 
-int16_t centor = 1500; // 1000 ~ 2000 us
-static const uint16_t margin = 20; // 10us
+// int16_t centor = 1500; // 1000 ~ 2000 us
+// static const uint16_t margin = 20; // 20us
 static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
@@ -55,14 +55,15 @@ void thro_service_process(void) {
         uint16_t data = 0;
         ring_buf_pop(&thro_buf, (void *)&data);
 
-        thro = data - centor;
+        thro = data - prj_cfg->center;
+        thro *= prj_cfg->dir;
 
         LOGD(TAG, "Throttle signal: %d", thro); // 1500 +- 544 in each 15ms
 
         // Check short 
         if ((abs(thro) < abs(pre_thro)) &&
-            (abs(thro-pre_thro) > margin) &&
-            (abs(thro) > margin)) {
+            (abs(thro-pre_thro) > prj_cfg->margin) &&
+            (abs(thro) > prj_cfg->margin)) {
             LOGI(TAG, "THRO_SHORT");
             event_cap |= BIT(THRO_SHORT);
             short_timeout = log_timestamp();
@@ -70,16 +71,16 @@ void thro_service_process(void) {
 
         // Check long 
         if ((abs(thro) < abs(pre_thro)) &&
-            (abs(thro-pre_thro) > margin) &&
-            (abs(thro) < margin)) {
+            (abs(thro-pre_thro) > prj_cfg->margin) &&
+            (abs(thro) < prj_cfg->margin)) {
             LOGI(TAG, "THRO_LONG");
             event_cap |= BIT(THRO_LONG);
             long_timeout = log_timestamp();
         }
 
         // Check fire 
-        if ((pre_thro > margin) &&
-            (abs(thro) < margin)) {
+        if ((pre_thro > prj_cfg->margin) &&
+            (abs(thro) < prj_cfg->margin)) {
             LOGI(TAG, "THRO_FIRE");
             event_cap |= BIT(THRO_FIRE);
             fire_timeout = log_timestamp();

@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 16:07:17
+ * @Last Modified time: 2025-01-02 16:36:56
  */
 
 #include "config.h"
@@ -29,7 +29,7 @@ typedef struct cfg_pack_t {
 static const prj_cfg_t default_cfg = {
     .version = 0,
     .dir = 1,
-    .centor = 1500,
+    .center = 1500,
     .margin = 10,
 };
 
@@ -62,7 +62,7 @@ void config_init(void) {
     LOGI(TAG, "prj_cfg:");
     LOGI(TAG, "  version = %d", prj_cfg->version);
     LOGI(TAG, "  dir = %d", prj_cfg->dir);
-    LOGI(TAG, "  centor = %d", prj_cfg->centor);
+    LOGI(TAG, "  center = %d", prj_cfg->center);
     LOGI(TAG, "  margin = %d\n", prj_cfg->margin);
 }
 

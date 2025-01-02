@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 15:01:03 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 16:17:02
+ * @Last Modified time: 2025-01-02 16:37:12
  */
 
 #include "shell_config.h"
@@ -26,7 +26,7 @@ static int shell_dump(int argc, char *argv[]) {
     LOGI(TAG, "prj_cfg:");
     LOGI(TAG, "  version = %d", prj_cfg->version);
     LOGI(TAG, "  dir = %d", prj_cfg->dir);
-    LOGI(TAG, "  centor = %d", prj_cfg->centor);
+    LOGI(TAG, "  center = %d", prj_cfg->center);
     LOGI(TAG, "  margin = %d\n", prj_cfg->margin);
     return 0;
 }
@@ -51,7 +51,7 @@ static int shell_dir(int argc, char *argv[]) {
     (void) argc;
 
     int8_t dir = strtol(argv[0], NULL, 10);
-    prj_cfg->centor = dir;
+    prj_cfg->dir = dir;
     LOGI(TAG, "dir = %d", prj_cfg->dir);
     return 0;
 }
@@ -60,8 +60,8 @@ static int shell_center(int argc, char *argv[]) {
     (void) argc;
 
     uint16_t num = strtol(argv[0], NULL, 10);
-    prj_cfg->centor = num;
-    LOGI(TAG, "centor = %d", prj_cfg->centor);
+    prj_cfg->center = num;
+    LOGI(TAG, "center = %d", prj_cfg->center);
     return 0;
 }
 

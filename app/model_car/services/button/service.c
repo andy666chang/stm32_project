@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:21:06
+ * @Last Modified time: 2025-01-02 16:36:09
  */
 
 #include "service.h"
@@ -10,6 +10,8 @@
 #include "gpio.h"
 
 #include "interfaces/interface.h"
+
+#include "services/throttle/config.h"
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
@@ -24,6 +26,8 @@
 
 #define ON 1
 #define OFF 0
+#define RC_MAX 2000
+#define RC_MIN 1000
 
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
@@ -94,7 +98,7 @@ static void btn_high_beam(void) {
  * 
  */
 void btn_service_process(void) {
-    static uint16_t pre_btn = 2000;
+    static uint16_t pre_btn = RC_MAX;
     static uint8_t cnt = 0;
 
     while (btn_buf.cnt) {
@@ -102,10 +106,10 @@ void btn_service_process(void) {
         ring_buf_pop(&btn_buf, (void *)&data);
 
         LOGD(TAG, "Button signal: %d", data); // 978 or 2045 in each 15ms
-        if (data >= 1500) {
-            data = 2000;
+        if (data >= prj_cfg->center) {
+            data = RC_MAX;
         } else {
-            data = 1000;
+            data = RC_MIN;
         }
 
         // Diff Button state
@@ -141,6 +145,9 @@ void btn_service_process(void) {
 
         case BTN_DIR: // Switch direction
             LOGI(TAG, "BTN_DIR");
+            prj_cfg->dir = -prj_cfg->dir;
+            LOGI(TAG, "dir = %d", prj_cfg->dir);
+            save_config();
             break;
 
         default:

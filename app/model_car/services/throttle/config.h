@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 16:07:33
+ * @Last Modified time: 2025-01-02 16:36:41
  */
 
 #pragma once
@@ -17,7 +17,7 @@ typedef struct prj_cfg_t {
     uint8_t version;
     
     int8_t dir;
-    uint16_t centor;
+    uint16_t center;
     uint16_t margin;
 } prj_cfg_t;
 
