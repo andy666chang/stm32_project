@@ -20,9 +20,8 @@ typedef struct cfg_pack_t {
     union pack_t {
         prj_cfg_t cfg;
         uint8_t dummy[252];
-    };
+    } pack;
 
-    union pack_t pack;
     uint32_t check; // CRC32
 } cfg_pack_t;
 

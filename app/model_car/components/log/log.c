@@ -28,7 +28,7 @@ void log_write(log_level_t level, const char *tag, const char *format,
 
         va_list arg;
         va_start(arg, format);
-        len = vsprintf(buf, format, arg);
+        len = vsprintf((char *)buf, format, arg);
         va_end(arg);
 
         // Send to DMA buffer

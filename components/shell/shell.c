@@ -56,6 +56,13 @@ static char shell_buf[SHELL_BUF_LEN] = {0};
 static uint16_t idx = 0;
 static uint8_t state = SHELL_RECEIVE_DEFAULT;
 
+__attribute__ ((weak)) void parse_shell(char *shell, uint32_t len) {
+    (void) shell;
+    (void) len;
+
+    LOGW(TAG, "Didn't implement parse_shell()!");
+}
+
 static void shell_history_record(char *pdata, uint16_t len)
 {
     memmove(shell_his[1], shell_his[0], SHELL_BUF_LEN * (SHELL_HIS_LEN - 1));
