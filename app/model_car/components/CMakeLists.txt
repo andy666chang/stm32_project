@@ -3,7 +3,7 @@
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     ../../../components/ring_buf/ring_buf.c
-    # ../../../components/log/log.c
+    ../../../components/log/log.c
     ../../../components/shell/shell.c
 
     log/log.c
