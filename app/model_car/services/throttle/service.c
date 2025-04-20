@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-04-20 02:53:47
+ * @Last Modified time: 2025-04-21 03:25:30
  */
 
 #include "service.h"
@@ -46,7 +46,7 @@ void thro_data_push(uint16_t data) {
  * @brief 
  * 
  */
-void thro_service_process(void) {
+static void thro_service_process(void) {
     static int16_t pre_thro = 0;
     static uint8_t event_cap = 0;
     static uint32_t short_timeout, long_timeout, fire_timeout;
@@ -154,7 +154,7 @@ void thro_service_process(void) {
  * 
  * @return int 
  */
-int thro_servic_init(void) {
+static int thro_service_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(thro_buf, thro_buf_data);
 
@@ -164,6 +164,9 @@ int thro_servic_init(void) {
 }
 
 #include "services/services.h"
-__attribute__((
-    section(".service_func"))) static const service_func_t thro_service =
-    thro_service_process;
+#include "services/services.h"
+__attribute__((used,
+               section(".service"))) static const service_t thro_service = {
+    .init = thro_service_init,
+    .process = thro_service_process,
+};

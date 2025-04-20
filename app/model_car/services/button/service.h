@@ -6,7 +6,5 @@
 #include <stdbool.h>
 
 void btn_data_push(uint16_t data);
-void btn_service_process(void);
-int btn_servic_init(void);
 
 #endif // _BTN_SERVICE_

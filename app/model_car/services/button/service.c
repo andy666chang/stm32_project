@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-04-20 02:54:07
+ * @Last Modified time: 2025-04-21 03:24:47
  */
 
 #include "service.h"
@@ -125,7 +125,7 @@ static void btn_cali(void) {
  * @brief 
  * 
  */
-void btn_service_process(void) {
+static void btn_service_process(void) {
     static uint16_t pre_btn = RC_MAX;
     static uint8_t cnt = 0;
 
@@ -211,7 +211,7 @@ void btn_service_process(void) {
  * 
  * @return int 
  */
-int btn_servic_init(void) {
+static int btn_service_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(btn_buf, btn_buf_data);
 
@@ -219,6 +219,8 @@ int btn_servic_init(void) {
 }
 
 #include "services/services.h"
-__attribute__((
-    section(".service_func"))) static const service_func_t btn_service =
-    btn_service_process;
+__attribute__((used,
+               section(".service"))) static const service_t btn_service = {
+    .init = btn_service_init,
+    .process = btn_service_process,
+};

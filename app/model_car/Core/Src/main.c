@@ -99,9 +99,10 @@ int main(void)
   log_route(HAL_GetTick);
   LOGI(TAG, "");
   LOGI(TAG, "Hello JSK studio!");
-  btn_servic_init();
-  thro_servic_init();
-  shell_servic_init();
+  SERVICE_SECTION_FOREACH(p) {
+    if (p->init)
+        p->init();
+  }
   led_init();
   rc_init();
   /* USER CODE END 2 */
@@ -110,20 +111,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-#if 0
-    btn_service_process();
-    thro_service_process();
-    shell_service_process();
-#else
-      extern service_func_t _start_service_func[];
-      extern service_func_t _stop_service_func[];
-
-      for (service_func_t *p = _start_service_func; p < _stop_service_func;
-           ++p) {
-          (*p)();
-      }
-
-#endif
+    SERVICE_SECTION_FOREACH(p) {
+        if (p->process)
+            p->process();
+    }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

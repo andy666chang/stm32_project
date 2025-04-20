@@ -1,10 +1,10 @@
 
 SECTIONS
 {
-  .service_func : {
+  .service : {
     . = ALIGN(4);
-    _start_service_func = .;
-    KEEP(*(.service_func))
-    _stop_service_func = .;
+    _start_service = .;
+    KEEP(*(.service))
+    _stop_service = .;
   } >FLASH
 }

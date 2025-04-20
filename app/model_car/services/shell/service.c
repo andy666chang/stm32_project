@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-05 20:26:05 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-04-20 02:53:56
+ * @Last Modified time: 2025-04-21 03:25:19
  */
 
 #include "service.h"
@@ -35,7 +35,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
  * @brief 
  * 
  */
-void shell_service_process(void) {
+static void shell_service_process(void) {
     static uint32_t sh_time = 0;
 
     if ((log_timestamp() - sh_time) >= SHELL_TIMEOUT) {
@@ -61,7 +61,7 @@ void shell_service_process(void) {
  * 
  * @return int 
  */
-int shell_servic_init(void) {
+static int shell_service_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(shell_buf, shell_buf_data);
 
@@ -73,6 +73,8 @@ int shell_servic_init(void) {
 }
 
 #include "services/services.h"
-__attribute__((
-    section(".service_func"))) static const service_func_t shell_service =
-    shell_service_process;
+__attribute__((used,
+               section(".service"))) static const service_t shell_service = {
+    .init = shell_service_init,
+    .process = shell_service_process,
+};
