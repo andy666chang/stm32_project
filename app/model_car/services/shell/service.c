@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-05 20:26:05 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 14:45:08
+ * @Last Modified time: 2025-04-20 02:53:56
  */
 
 #include "service.h"
@@ -71,3 +71,8 @@ int shell_servic_init(void) {
 
     return 0;
 }
+
+#include "services/services.h"
+__attribute__((
+    section(".service_func"))) static const service_func_t shell_service =
+    shell_service_process;

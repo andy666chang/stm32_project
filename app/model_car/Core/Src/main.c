@@ -25,6 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "interfaces/interface.h"
+#include "services/services.h"
 #include "services/button/service.h"
 #include "services/throttle/service.h"
 #include "services/shell/service.h"
@@ -109,9 +110,20 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+#if 0
     btn_service_process();
     thro_service_process();
     shell_service_process();
+#else
+      extern service_func_t _start_service_func[];
+      extern service_func_t _stop_service_func[];
+
+      for (service_func_t *p = _start_service_func; p < _stop_service_func;
+           ++p) {
+          (*p)();
+      }
+
+#endif
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

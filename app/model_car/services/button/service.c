@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 23:50:16
+ * @Last Modified time: 2025-04-20 02:54:07
  */
 
 #include "service.h"
@@ -217,3 +217,8 @@ int btn_servic_init(void) {
 
     return 0;
 }
+
+#include "services/services.h"
+__attribute__((
+    section(".service_func"))) static const service_func_t btn_service =
+    btn_service_process;

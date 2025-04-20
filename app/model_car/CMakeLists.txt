@@ -77,3 +77,5 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fdiagnostics-color=always")
+
+# target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "-Wl,-Map=${CMAKE_BINARY_DIR}/output.map")
