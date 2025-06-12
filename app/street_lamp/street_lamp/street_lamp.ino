@@ -2,41 +2,68 @@
 #include <Wire.h>
 #include <VL53L0X.h>
 
-#define SEN_NUM 1
+#define SEN_NUM 5
+#define LED_KEEP 200
 
-VL53L0X sensors[SEN_NUM];
-
-#define LED_PIN A0
-uint8_t led_pin[SEN_NUM] = {A0};
-uint32_t time_cnt[SEN_NUM];
+struct dev_t {
+  uint8_t en_pin;
+  uint8_t led_pin;
+  uint8_t check;
+  unsigned long time_cnt;
+  VL53L0X sensor;
+} sens[SEN_NUM] = {
+  {.en_pin = 2, .led_pin = 13,},
+  {.en_pin = 3, .led_pin = 8,},
+  {.en_pin = 4, .led_pin = 9,},
+  {.en_pin = 5, .led_pin = 10,},
+  {.en_pin = 6, .led_pin = 11,},
+};
 
 void setup()
 {
   Serial.begin(115200);
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
-    pinMode( led_pin[i], OUTPUT );
-    digitalWrite( led_pin[i], LOW );
+    pinMode( sens[i].en_pin, OUTPUT );
+    pinMode( sens[i].en_pin, LOW );
 
-    time_cnt[i] = 0;
+    pinMode( sens[i].led_pin, OUTPUT );
+    pinMode( sens[i].led_pin, HIGH );
+
+    sens[i].check = 0;
+    sens[i].time_cnt = 0;
   }
 
   Wire.begin();
   Wire.setClock(200000);
 
+  _delay_ms(1000);
+
   for (uint8_t i = 0; i < SEN_NUM; i++) {
-    sensors[i].setTimeout(50);
-    if (!sensors[i].init())
-    {
-      Serial.println("Failed to detect and initialize sensor!");
-      while (1) {}
+    pinMode( sens[i].en_pin, HIGH );
+    sens[i].sensor.setTimeout(50);
+
+    if (!sens[i].sensor.init()) {
+      Serial.print("Failed to detect and initialize sensor: ");
+      Serial.print(i);
+      Serial.println(" ");
+      continue;
     }
+
+    uint8_t addr = sens[i].sensor.getAddress();
+    sens[i].sensor.setAddress(addr+i+SEN_NUM);
+    sens[i].check = 1;
+
+    Serial.print("addr:");
+    Serial.print(addr);
+    Serial.print(" -> ");
+    Serial.println(addr+i+SEN_NUM);
 
     // Start continuous back-to-back mode (take readings as
     // fast as possible).  To use continuous timed mode
     // instead, provide a desired inter-measurement period in
     // ms (e.g. sensor.startContinuous(100)).
-    sensors[i].startContinuous();
+    sens[i].sensor.startContinuous();
   }
 }
 
@@ -52,10 +79,13 @@ void loop()
   Serial.print(" ");
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
+    if (sens[i].check != 1)
+      continue;
+
     // Serial.print("Dis: ");
-    uint16_t data = sensors[i].readRangeContinuousMillimeters();
+    uint16_t data = sens[i].sensor.readRangeContinuousMillimeters();
     // Serial.print("mm");
-    if (sensors[i].timeoutOccurred()) { Serial.print(" TIMEOUT"); }
+    if (sens[i].sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
 
     if (data > 250) {
       data = 250;
@@ -70,22 +100,19 @@ void loop()
     // Serial.print("flag: ");
     if (data < 180) {
       Serial.print("200 ");
-      time_cnt[i] = millis();
-      digitalWrite( led_pin[i], HIGH );
+      sens[i].time_cnt = millis();
+      digitalWrite( sens[i].led_pin, LOW );
     } else {
       Serial.print("100 ");
+    }
+
+    unsigned long ms = millis();
+    if (ms - sens[i].time_cnt > LED_KEEP) {
+      digitalWrite( sens[i].led_pin, HIGH );
     }
   }
 
   Serial.println();
-
-  uint16_t ms = millis();
-  for (uint8_t i = 0; i < SEN_NUM; i++) {
-    if (ms - time_cnt[i] > 100) {
-      digitalWrite( led_pin[i], LOW );
-    }
-  }
-
 
   _delay_ms(10);
 }
