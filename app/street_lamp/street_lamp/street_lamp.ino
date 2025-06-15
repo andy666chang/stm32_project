@@ -25,7 +25,7 @@ void setup()
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
     pinMode( sens[i].en_pin, OUTPUT );
-    pinMode( sens[i].en_pin, LOW );
+    pinMode( sens[i].en_pin, HIGH );
 
     pinMode( sens[i].led_pin, OUTPUT );
     pinMode( sens[i].led_pin, HIGH );
@@ -40,7 +40,7 @@ void setup()
   _delay_ms(1000);
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
-    pinMode( sens[i].en_pin, HIGH );
+    pinMode( sens[i].en_pin, LOW );
     sens[i].sensor.setTimeout(50);
 
     if (!sens[i].sensor.init()) {
