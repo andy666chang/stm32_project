@@ -12,11 +12,11 @@ struct dev_t {
   unsigned long time_cnt;
   VL53L0X sensor;
 } sens[SEN_NUM] = {
-  {.en_pin = 2, .led_pin = 13,},
-  {.en_pin = 3, .led_pin = 8,},
-  {.en_pin = 4, .led_pin = 9,},
-  {.en_pin = 5, .led_pin = 10,},
-  {.en_pin = 6, .led_pin = 11,},
+  {.en_pin =  2, .led_pin =  3,},
+  {.en_pin =  4, .led_pin =  5,},
+  {.en_pin =  6, .led_pin =  7,},
+  {.en_pin =  8, .led_pin =  9,},
+  {.en_pin = 10, .led_pin = 11,},
 };
 
 void setup()
