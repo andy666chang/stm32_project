@@ -25,10 +25,10 @@ void setup()
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
     pinMode( sens[i].en_pin, OUTPUT );
-    pinMode( sens[i].en_pin, HIGH );
+    digitalWrite( sens[i].en_pin, HIGH );
 
     pinMode( sens[i].led_pin, OUTPUT );
-    pinMode( sens[i].led_pin, HIGH );
+    digitalWrite( sens[i].led_pin, HIGH );
 
     sens[i].check = 0;
     sens[i].time_cnt = 0;
@@ -40,7 +40,7 @@ void setup()
   _delay_ms(1000);
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
-    pinMode( sens[i].en_pin, LOW );
+    digitalWrite( sens[i].en_pin, LOW );
     sens[i].sensor.setTimeout(50);
 
     if (!sens[i].sensor.init()) {
