@@ -10,6 +10,7 @@ struct dev_t {
   uint8_t led_pin;
   uint8_t check;
   unsigned long time_cnt;
+  uint16_t low_pass;
   VL53L0X sensor;
 } sens[SEN_NUM] = {
   {.en_pin =  2, .led_pin =  3,},
@@ -19,13 +20,15 @@ struct dev_t {
   {.en_pin = 10, .led_pin = 11,},
 };
 
+void(* resetFunc) (void) = 0;
+
 void setup()
 {
   Serial.begin(115200);
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
     pinMode( sens[i].en_pin, OUTPUT );
-    digitalWrite( sens[i].en_pin, HIGH );
+    digitalWrite( sens[i].en_pin, LOW );
 
     pinMode( sens[i].led_pin, OUTPUT );
     digitalWrite( sens[i].led_pin, HIGH );
@@ -40,8 +43,8 @@ void setup()
   _delay_ms(1000);
 
   for (uint8_t i = 0; i < SEN_NUM; i++) {
-    digitalWrite( sens[i].en_pin, LOW );
-    sens[i].sensor.setTimeout(50);
+    digitalWrite( sens[i].en_pin, HIGH );
+    sens[i].sensor.setTimeout(100);
 
     if (!sens[i].sensor.init()) {
       Serial.print("Failed to detect and initialize sensor: ");
@@ -69,7 +72,7 @@ void setup()
 
 void loop()
 {
-  int min = 100, max = 250;
+  int min = 0, max = 1000;
   // Serial.print("min: ");
   Serial.print(min);
   Serial.print(" ");
@@ -87,18 +90,28 @@ void loop()
     // Serial.print("mm");
     if (sens[i].sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
 
-    if (data > 250) {
-      data = 250;
-    } else if (data < 100) {
-      data = 100;
+    if (data == 65535) {
+      Serial.println("\nRead sensor: " + String(i) + " error !!\n");
+      _delay_ms(1000);
+      resetFunc();
     }
 
+    sens[i].low_pass = (0.85*sens[i].low_pass) + (0.15*data);
+    uint16_t hp_data = abs((int32_t)data - (int32_t)sens[i].low_pass);
+
+    // if (data > 250) {
+    //   data = 250;
+    // } else if (data < 100) {
+    //   data = 100;
+    // }
+
     // Serial.print("data: ");
-    Serial.print(data);
-    Serial.print(" ");
+    // Serial.print(data);
+    // Serial.print(" ");
+    Serial.print(String(data) + " " + String(sens[i].low_pass) + " " + String(hp_data) + " ");
 
     // Serial.print("flag: ");
-    if (data < 180) {
+    if (hp_data > 30) {
       Serial.print("200 ");
       sens[i].time_cnt = millis();
       digitalWrite( sens[i].led_pin, LOW );
