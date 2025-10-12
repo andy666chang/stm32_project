@@ -16,9 +16,9 @@
 #include "components/log/log.h"
 
 #define TAG "THRO"
-#define THRO_SHORT_TIMEOUT  500
+#define THRO_SHORT_TIMEOUT  300
 #define THRO_LONG_TIMEOUT  1000
-#define THRO_FIRE_TIMEOUT   500
+#define THRO_FIRE_TIMEOUT    50
 
 #define THRO_NONE   0
 #define THRO_SHORT  1
@@ -49,7 +49,9 @@ void thro_data_push(uint16_t data) {
 void thro_service_process(void) {
     static int16_t pre_thro = 0;
     static uint8_t event_cap = 0;
-    static uint32_t short_timeout, long_timeout, fire_timeout;
+    static uint32_t short_timeout;
+    // static uint32_t long_timeout;
+    static uint32_t fire_timeout;
     int16_t thro = 0;
 
     while (thro_buf.cnt) {
@@ -66,7 +68,7 @@ void thro_service_process(void) {
 
         LOGD(TAG, "Throttle signal: %d", thro); // 1500 +- 544 in each 15ms
 
-        // Check short 
+        // // Check short 
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro-pre_thro) > prj_cfg->margin) &&
             (abs(thro) > prj_cfg->margin)) {
@@ -76,13 +78,13 @@ void thro_service_process(void) {
         }
 
         // Check long 
-        if ((abs(thro) < abs(pre_thro)) &&
-            (abs(thro-pre_thro) > prj_cfg->margin) &&
-            (abs(thro) < prj_cfg->margin)) {
-            LOGI(TAG, "THRO_LONG");
-            event_cap |= BIT(THRO_LONG);
-            long_timeout = log_timestamp();
-        }
+        // if ((abs(thro) < abs(pre_thro)) &&
+        //     (abs(thro-pre_thro) > prj_cfg->margin) &&
+        //     (abs(thro) < prj_cfg->margin)) {
+        //     LOGI(TAG, "THRO_LONG");
+        //     event_cap |= BIT(THRO_LONG);
+        //     long_timeout = log_timestamp();
+        // }
 
         // Check fire 
         if ((pre_thro > prj_cfg->margin) &&
@@ -116,33 +118,41 @@ void thro_service_process(void) {
     }
 
     // long
-    if (event_cap & BIT(THRO_LONG)) {
-        // turn on tail led
-        led_tail_set(0, ON);
-        led_tail_set(1, ON);
+    // if (event_cap & BIT(THRO_LONG)) {
+    //     // turn on tail led
+    //     led_tail_set(0, ON);
+    //     led_tail_set(1, ON);
 
-        if ( (log_timestamp() - long_timeout) > THRO_LONG_TIMEOUT ) {
-            // turn off tail led
-            if (sw_state == 0)
-                led_tail_set(0, OFF);
-            led_tail_set(1, OFF);
+    //     if ( (log_timestamp() - long_timeout) > THRO_LONG_TIMEOUT ) {
+    //         // turn off tail led
+    //         if (sw_state == 0)
+    //             led_tail_set(0, OFF);
+    //         led_tail_set(1, OFF);
             
-            // Clear event
-            event_cap &= ~(BIT(THRO_LONG));
-        }
-    }
+    //         // Clear event
+    //         event_cap &= ~(BIT(THRO_LONG));
+    //     }
+    // }
 
     // fire
     if (event_cap & BIT(THRO_FIRE)) {
-        // turn on fire led
-        led_fire_set(ON);
+        uint32_t duration = log_timestamp() - fire_timeout;
 
-        if ( (log_timestamp() - fire_timeout) > THRO_FIRE_TIMEOUT ) {
+        if (duration > 3 * THRO_FIRE_TIMEOUT) {
             // turn off fire led
             led_fire_set(OFF);
-            
+
             // Clear event
             event_cap &= ~(BIT(THRO_FIRE));
+        } else if (duration > 2 * THRO_FIRE_TIMEOUT) {
+            // turn off fire led
+            led_fire_set(ON);
+        } else if (duration > 1 * THRO_FIRE_TIMEOUT) {
+            // turn off fire led
+            led_fire_set(OFF);
+        } else if (duration < THRO_FIRE_TIMEOUT) {
+            // turn on fire led
+            led_fire_set(ON);
         }
     }
 

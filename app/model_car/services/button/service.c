@@ -17,7 +17,7 @@
 #include "components/log/log.h"
 
 #define TAG "BTN"
-#define BTN_TIMEOUT 300
+#define BTN_TIMEOUT 750
 #define FLASH_TIMEOUT 500
 #define CALI_TIMEOUT 1500
 
@@ -171,7 +171,11 @@ void btn_service_process(void) {
         case BTN_FALSH: // LED Flash
             LOGI(TAG, "BTN_FLASH");
             if (sub_process == btn_led_flash) {
-                led_chasis_set(OFF);
+                if (sw_state == 0)
+                    led_chasis_set(OFF);
+                else 
+                    led_chasis_set(ON);
+
                 sub_process = NULL;
             } else if (sub_process == NULL) {
                 sub_process = btn_led_flash;
