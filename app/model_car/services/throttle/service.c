@@ -24,6 +24,7 @@
 #define THRO_SHORT  1
 #define THRO_LONG   2
 #define THRO_FIRE   3
+#define THRO_UPDATE 4
 
 #define BIT(n) (UINT32_C(1) << (n))
 
@@ -94,7 +95,11 @@ void thro_service_process(void) {
             fire_timeout = log_timestamp();
         }
 
-        
+        // Check thro update
+        if (prj_cfg->mode == 1) {
+            event_cap |= BIT(THRO_UPDATE);
+        }
+
         // Record thro state
         pre_thro = thro;
     }
@@ -154,6 +159,11 @@ void thro_service_process(void) {
             // turn on fire led
             led_fire_set(ON);
         }
+    }
+
+    if ((event_cap & BIT(THRO_UPDATE))) {
+        thro_led_update(thro);
+        event_cap &= ~(BIT(THRO_UPDATE));
     }
 
     return;

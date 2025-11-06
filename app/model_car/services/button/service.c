@@ -25,6 +25,7 @@
 #define BTN_SWITCH      1
 #define BTN_HIGH_BEAM   2
 #define BTN_FALSH       3
+#define BTN_MODE        4
 #define BTN_CALI        6
 #define BTN_DIR         9
 
@@ -194,6 +195,19 @@ void btn_service_process(void) {
             prj_cfg->dir = -prj_cfg->dir;
             LOGI(TAG, "dir = %d", prj_cfg->dir);
             save_config();
+            break;
+
+        case BTN_MODE: // Switch mode
+            LOGI(TAG, "BTN_MODE");
+            prj_cfg->mode = !prj_cfg->mode;
+            LOGI(TAG, "mode = %d", prj_cfg->mode);
+            save_config();
+
+            if (prj_cfg->mode == 1) {
+                led_string_set(ON);
+            } else {
+                led_string_set(OFF);
+            }
             break;
 
         default:

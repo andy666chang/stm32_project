@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 void led_head_set(uint8_t id, bool en);
 bool led_head_get(uint8_t id);
@@ -13,6 +14,8 @@ void led_chasis_set(bool en);
 bool led_chasis_get(void);
 void led_fire_set(bool en);
 bool led_fire_get(void);
+void led_string_set(bool en);
+void thro_led_update(int16_t thro);
 
 int led_init(void);
 int rc_init(void);

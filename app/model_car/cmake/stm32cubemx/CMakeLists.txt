@@ -7,6 +7,7 @@ add_library(stm32cubemx INTERFACE)
 enable_language(C ASM)
 
 target_compile_definitions(stm32cubemx INTERFACE 
+	USE_FULL_LL_DRIVER 
 	USE_HAL_DRIVER 
 	STM32G031xx
     $<$<CONFIG:Debug>:DEBUG>
@@ -28,6 +29,9 @@ target_sources(stm32cubemx INTERFACE
     ../../Core/Src/usart.c
     ../../Core/Src/stm32g0xx_it.c
     ../../Core/Src/stm32g0xx_hal_msp.c
+    ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_utils.c
+    ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_exti.c
+    ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_ll_gpio.c
     ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim.c
     ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_tim_ex.c
     ../../../../sdk/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_rcc.c
