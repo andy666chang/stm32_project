@@ -19,6 +19,7 @@ typedef struct prj_cfg_t {
     int8_t dir;
     uint16_t center;
     uint16_t margin;
+    uint16_t max;
 
     bool mode;
     uint8_t bar_idx;

@@ -31,6 +31,8 @@ static const prj_cfg_t default_cfg = {
     .dir = 1,
     .center = 1500,
     .margin = 10,
+    .max = 2000,
+    
     .mode = 0,
     .bar_idx = 0,
 };

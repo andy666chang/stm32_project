@@ -172,10 +172,20 @@ void thro_service_process(void) {
 
     // calibration
     if (event_cap & BIT(THRO_CALI)) {
-        prj_cfg->center = data;
+        //  Capture center value
+        if ((log_timestamp() - cali_time) < THRO_CALI_TIMEOUT) {
+            //  Capture center value
+            prj_cfg->center = data;
 
-        if ((log_timestamp() - cali_time) > THRO_CALI_TIMEOUT) {
+            led_tail_set(0, ON);
+            led_tail_set(1, ON);
+        } else if ((log_timestamp() - cali_time) < 2 * THRO_CALI_TIMEOUT) {
+            //  Capture max value
+            prj_cfg->max = data;
+            led_fire_set(ON);
+        } else {
             LOGI(TAG, "center = %d", prj_cfg->center);
+            LOGI(TAG, "max = %d", prj_cfg->max);
             save_config();
 
             // Exit calibration mode
@@ -184,6 +194,10 @@ void thro_service_process(void) {
 
             // Clear event
             event_cap &= ~(BIT(THRO_CALI));
+
+            // Restart
+            HAL_Delay(100);
+            HAL_NVIC_SystemReset();
         }
     }
 
