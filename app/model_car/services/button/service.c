@@ -26,14 +26,16 @@
 #define BTN_SWITCH      1
 #define BTN_HIGH_BEAM   2
 #define BTN_FALSH       3
-#define BTN_MODE        4
+#define BTN_LED_SEL     4
 #define BTN_CALI        6
+#define BTN_MODE        7
 #define BTN_DIR         9
 
 #define ON 1
 #define OFF 0
 #define RC_MAX 2000
 #define RC_MIN 1000
+#define RC_CENTER 1500
 
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
@@ -124,7 +126,7 @@ void btn_service_process(void) {
         ring_buf_pop(&btn_buf, (void *)&data);
 
         LOGD(TAG, "Button signal: %d", data); // 978 or 2045 in each 15ms
-        if (data >= prj_cfg->center) {
+        if (data >= RC_CENTER) {
             data = RC_MAX;
         } else {
             data = RC_MIN;
@@ -149,8 +151,16 @@ void btn_service_process(void) {
         // Send event
         switch (cnt) {
         case BTN_SWITCH: // Switch on/off
-            LOGI(TAG, "BTN_SWITCH");
-            btn_switch();
+            if (system_get_state() == SYSTEM_LED_SELECT) {
+                prj_cfg->bar_idx++;
+                if (prj_cfg->bar_idx >= led_idx_max()) {
+                    prj_cfg->bar_idx = 0;
+                }
+                LOGI(TAG, "Select bar idx: %d", prj_cfg->bar_idx);
+            } else {
+                LOGI(TAG, "BTN_SWITCH");
+                btn_switch();
+            }
             break;
 
         case BTN_HIGH_BEAM: // High beam
@@ -171,6 +181,16 @@ void btn_service_process(void) {
                 sub_process = btn_led_flash;
             }
             break;
+        
+        case BTN_LED_SEL:
+            LOGI(TAG, "BTN_LED_SEL");
+            if (system_get_state() == SYSTEM_NORMAL) {
+                system_set_state(SYSTEM_LED_SELECT);
+            } else if (system_get_state() == SYSTEM_LED_SELECT) {
+                save_config();
+                system_set_state(SYSTEM_NORMAL);
+            }
+            break;
 
         case BTN_CALI: // Calibration
             LOGI(TAG, "BTN_CALI");
@@ -184,6 +204,10 @@ void btn_service_process(void) {
             prj_cfg->dir = -prj_cfg->dir;
             LOGI(TAG, "dir = %d", prj_cfg->dir);
             save_config();
+
+            // Restart
+            HAL_Delay(100);
+            HAL_NVIC_SystemReset();
             break;
 
         case BTN_MODE: // Switch mode

@@ -3,6 +3,8 @@
 enum sys_state_t {
     SYSTEM_NORMAL = 0,
     SYSTEM_CALIBRATION,
+    SYSTEM_LED_SELECT,
+
     SYSTEM_MAX,
 };
 

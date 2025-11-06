@@ -75,6 +75,9 @@ void thro_service_process(void) {
                 cali_time = log_timestamp();
             }
             break;
+        } else if (system_get_state() == SYSTEM_LED_SELECT) {
+            thro_led_update(prj_cfg->max);
+            break;
         }
 
         thro = data - prj_cfg->center;

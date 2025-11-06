@@ -363,6 +363,10 @@ static const union led_pack_t led_ref[][12] = {
     },
 };
 
+uint8_t led_idx_max(void) {
+    return ARRAY_SIZE(led_ref);
+}
+
 /**
  * @brief 
  * 
