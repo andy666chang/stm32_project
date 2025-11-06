@@ -15,6 +15,7 @@
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
+#include "system.h"
 
 #define TAG "BTN"
 #define BTN_TIMEOUT 750
@@ -37,14 +38,12 @@
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
 static uint32_t time = 0; // Record time stamp for fast click
-static uint32_t cali_time = 0; // Record time stamp for calibration
 
 void btn_data_push(uint16_t data) {
     ring_buf_push(&btn_buf, (void *)&data);
 }
 
 uint8_t sw_state = 0;
-uint8_t cali_state = 0;
 static bool beam_state = 0;
 
 static void (*sub_process)(void) = NULL;
@@ -112,16 +111,6 @@ static void btn_led_flash(void) {
     }
 }
 
-static void btn_cali(void) {
-    if ((log_timestamp() - cali_time) >= CALI_TIMEOUT) {
-        LOGI(TAG, "center = %d", prj_cfg->center);
-        LOGI(TAG, "BTN_CALI finish");
-        save_config();
-        cali_state = 0;
-        sub_process = NULL;
-    }
-}
-
 /**
  * @brief 
  * 
@@ -185,9 +174,9 @@ void btn_service_process(void) {
 
         case BTN_CALI: // Calibration
             LOGI(TAG, "BTN_CALI");
-            cali_state = 1;
-            cali_time = log_timestamp();
-            sub_process = btn_cali;
+            if (system_get_state() == SYSTEM_NORMAL) {
+                system_set_state(SYSTEM_CALIBRATION);
+            }
             break;
 
         case BTN_DIR: // Switch direction

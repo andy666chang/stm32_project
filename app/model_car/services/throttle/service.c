@@ -14,17 +14,22 @@
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
+#include "system.h"
 
 #define TAG "THRO"
 #define THRO_SHORT_TIMEOUT  300
 #define THRO_LONG_TIMEOUT  1000
 #define THRO_FIRE_TIMEOUT    50
+#define THRO_CALI_TIMEOUT  2000
 
-#define THRO_NONE   0
-#define THRO_SHORT  1
-#define THRO_LONG   2
-#define THRO_FIRE   3
-#define THRO_UPDATE 4
+enum {
+    THRO_NONE = 0,
+    THRO_SHORT,
+    THRO_LONG,
+    THRO_FIRE,
+    THRO_UPDATE,
+    THRO_CALI,
+};
 
 #define BIT(n) (UINT32_C(1) << (n))
 
@@ -37,7 +42,6 @@ static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
 extern uint8_t sw_state;
-extern uint8_t cali_state;
 
 void thro_data_push(uint16_t data) {
     ring_buf_push(&thro_buf, (void *)&data);
@@ -49,18 +53,23 @@ void thro_data_push(uint16_t data) {
  */
 void thro_service_process(void) {
     static int16_t pre_thro = 0;
-    static uint8_t event_cap = 0;
+    static uint16_t event_cap = 0;
     static uint32_t short_timeout;
     // static uint32_t long_timeout;
     static uint32_t fire_timeout;
+    static uint32_t cali_time; // Record time stamp for calibration
     int16_t thro = 0;
+    static uint16_t data = 0;
 
     while (thro_buf.cnt) {
-        uint16_t data = 0;
         ring_buf_pop(&thro_buf, (void *)&data);
 
-        if (cali_state) {
-            prj_cfg->center = data;
+        // Check calibration
+        if (system_get_state() == SYSTEM_CALIBRATION) {
+            if ((event_cap & BIT(THRO_CALI)) == 0) {
+                event_cap |= BIT(THRO_CALI);
+                cali_time = log_timestamp();
+            }
             break;
         }
 
@@ -69,7 +78,7 @@ void thro_service_process(void) {
 
         LOGD(TAG, "Throttle signal: %d", thro); // 1500 +- 544 in each 15ms
 
-        // // Check short 
+        // Check short 
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro-pre_thro) > prj_cfg->margin) &&
             (abs(thro) > prj_cfg->margin)) {
@@ -158,6 +167,23 @@ void thro_service_process(void) {
         } else if (duration < THRO_FIRE_TIMEOUT) {
             // turn on fire led
             led_fire_set(ON);
+        }
+    }
+
+    // calibration
+    if (event_cap & BIT(THRO_CALI)) {
+        prj_cfg->center = data;
+
+        if ((log_timestamp() - cali_time) > THRO_CALI_TIMEOUT) {
+            LOGI(TAG, "center = %d", prj_cfg->center);
+            save_config();
+
+            // Exit calibration mode
+            system_set_state(SYSTEM_NORMAL);
+            LOGI(TAG, "Exit calibration mode");
+
+            // Clear event
+            event_cap &= ~(BIT(THRO_CALI));
         }
     }
 
