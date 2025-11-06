@@ -20,7 +20,9 @@
 #define THRO_SHORT_TIMEOUT  300
 #define THRO_LONG_TIMEOUT  1000
 #define THRO_FIRE_TIMEOUT    50
-#define THRO_CALI_TIMEOUT  2000
+#define THRO_CALI_STEP1    2000
+#define THRO_CALI_STEP2    (2 * THRO_CALI_STEP1)
+#define THRO_CALI_TIMEOUT  (5 * THRO_CALI_STEP1)
 
 enum {
     THRO_INPUT = 0,
@@ -60,7 +62,7 @@ void thro_service_process(void) {
     static uint32_t fire_timeout;
     static uint32_t cali_time; // Record time stamp for calibration
     int16_t thro = 0;
-    static uint16_t data = 0;
+    uint16_t data = 0;
 
     while (thro_buf.cnt) {
         ring_buf_pop(&thro_buf, (void *)&data);
@@ -198,17 +200,23 @@ void thro_service_process(void) {
     }
 
     // calibration
-    if (event_cap & BIT(THRO_CALI)) {
+    if ((event_cap & BIT(THRO_CALI)) &&
+        (log_timestamp() - cali_time) < THRO_CALI_TIMEOUT) {
         //  Capture center value
-        if ((log_timestamp() - cali_time) < THRO_CALI_TIMEOUT) {
+        if ((log_timestamp() - cali_time) < THRO_CALI_STEP1) {
             //  Capture center value
-            prj_cfg->center = data;
+            if ((event_cap & BIT(THRO_INPUT))) {
+                prj_cfg->center = data;
+            }
 
             led_tail_set(0, ON);
             led_tail_set(1, ON);
-        } else if ((log_timestamp() - cali_time) < 2 * THRO_CALI_TIMEOUT) {
+        } else if ((log_timestamp() - cali_time) < THRO_CALI_STEP2) {
             //  Capture max value
-            prj_cfg->max = data;
+            if ((event_cap & BIT(THRO_INPUT))) {
+                prj_cfg->max = data;
+            }
+
             led_fire_set(ON);
         } else {
             LOGI(TAG, "center = %d", prj_cfg->center);
@@ -228,6 +236,7 @@ void thro_service_process(void) {
         }
     }
 
+    // Update throttle led bar
     if ((event_cap & BIT(THRO_UPDATE))) {
         thro_led_update(thro);
         thro_led_update(thro); // update twice to avoid miss
