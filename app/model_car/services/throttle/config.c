@@ -64,13 +64,7 @@ void config_init(void) {
     prj_cfg = &cfg_pack.pack.cfg;
 
     // Dump config
-    LOGI(TAG, "prj_cfg:");
-    LOGI(TAG, "  version = %d", prj_cfg->version);
-    LOGI(TAG, "  dir = %d", prj_cfg->dir);
-    LOGI(TAG, "  center = %d", prj_cfg->center);
-    LOGI(TAG, "  margin = %d", prj_cfg->margin);
-    LOGI(TAG, "  mode = %d", prj_cfg->mode);
-    LOGI(TAG, "  bar_idx = %d", prj_cfg->bar_idx);
+    dump_config();
 }
 
 void load_config(void) {
@@ -84,4 +78,15 @@ void save_config(void) {
     // Erase and write to flash
     flash_erase(CFG_ADDR, sizeof(cfg_pack_t));
     flash_write(CFG_ADDR, (uint8_t *)&cfg_pack, sizeof(cfg_pack_t));
+}
+
+void dump_config(void) {
+    LOGI(TAG, "prj_cfg:");
+    LOGI(TAG, "  version = %d", prj_cfg->version);
+    LOGI(TAG, "  dir = %d", prj_cfg->dir);
+    LOGI(TAG, "  center = %d", prj_cfg->center);
+    LOGI(TAG, "  margin = %d", prj_cfg->margin);
+    LOGI(TAG, "  max = %d", prj_cfg->max);
+    LOGI(TAG, "  mode = %d", prj_cfg->mode);
+    LOGI(TAG, "  bar_idx = %d", prj_cfg->bar_idx);
 }

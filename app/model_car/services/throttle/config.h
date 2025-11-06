@@ -30,3 +30,4 @@ extern prj_cfg_t *prj_cfg;
 void config_init(void);
 void load_config(void);
 void save_config(void);
+void dump_config(void);
