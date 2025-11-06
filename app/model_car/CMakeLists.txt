@@ -55,6 +55,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     interfaces/rc.c
     interfaces/led.c
     interfaces/flash.c
+
+    system.c
 )
 
 # Add include paths
