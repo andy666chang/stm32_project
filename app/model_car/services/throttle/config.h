@@ -21,6 +21,7 @@ typedef struct prj_cfg_t {
     uint16_t margin;
 
     bool mode;
+    uint8_t bar_idx;
 } prj_cfg_t;
 
 extern prj_cfg_t *prj_cfg;

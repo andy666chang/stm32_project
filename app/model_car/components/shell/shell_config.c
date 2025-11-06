@@ -27,7 +27,9 @@ static int shell_dump(int argc, char *argv[]) {
     LOGI(TAG, "  version = %d", prj_cfg->version);
     LOGI(TAG, "  dir = %d", prj_cfg->dir);
     LOGI(TAG, "  center = %d", prj_cfg->center);
-    LOGI(TAG, "  margin = %d\n", prj_cfg->margin);
+    LOGI(TAG, "  margin = %d", prj_cfg->margin);
+    LOGI(TAG, "  mode = %d", prj_cfg->mode);
+    LOGI(TAG, "  bar_idx = %d\n", prj_cfg->bar_idx);
     return 0;
 }
 
@@ -74,6 +76,24 @@ static int shell_margin(int argc, char *argv[]) {
     return 0;
 }
 
+static int shell_mode(int argc, char *argv[]) {
+    (void) argc;
+
+    bool mode = strtol(argv[0], NULL, 10);
+    prj_cfg->mode = mode;
+    LOGI(TAG, "mode = %d", prj_cfg->mode);
+    return 0;
+}
+
+static int shell_bar_idx(int argc, char *argv[]) {
+    (void) argc;
+
+    uint8_t bar_idx = strtol(argv[0], NULL, 10);
+    prj_cfg->bar_idx = bar_idx;
+    LOGI(TAG, "bar_idx = %d", prj_cfg->bar_idx);
+    return 0;
+}
+
 struct shell_t _cfg_list[] = {
     { "dump", "dump config", shell_dump, NULL},
     { "load", "load config", shell_load, NULL},
@@ -81,5 +101,7 @@ struct shell_t _cfg_list[] = {
     { "dir" , "dir -1/1", shell_dir, NULL},
     { "center", "center <1500>", shell_center, NULL},
     { "margin", "margin <10>", shell_margin, NULL},
+    { "mode", "mode <0/1>", shell_mode, NULL},
+    { "bar_idx", "bar_idx <0-3>", shell_bar_idx, NULL},
     SHELL_END,
 };

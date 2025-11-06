@@ -18,8 +18,24 @@
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
+#ifndef ARRAY_SIZE
+  #define ARRAY_SIZE(X) (sizeof(X) / sizeof(X[0]))
+#endif
+
 // #define SK6812
 #define WS2812B
+
+union led_pack_t {
+    struct led_data_t {
+        // Little endian
+        uint8_t b;
+        uint8_t r;
+        uint8_t g;
+        uint8_t rev;
+    } color;
+
+    uint32_t data;
+};
 
 /**
  * @brief 
@@ -207,8 +223,6 @@ static inline void led_set_low(void) {
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP();
 #endif
 }
 
@@ -238,13 +252,13 @@ static inline void led_set_high(void) {
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    __NOP(); __NOP(); __NOP();
 
     // T1L: 0.45 +- 0.15 us
     LL_GPIO_ResetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    __NOP(); __NOP();
 #endif
 }
 
@@ -255,7 +269,7 @@ static inline void led_set_high(void) {
 static void led_reset(void) {
     // Trst: Low level > 80us
     HAL_GPIO_WritePin(CHASIS_GPIO_Port, CHASIS_Pin, GPIO_PIN_RESET);
-    for (size_t i = 0; i < 600; i++) {
+    for (size_t i = 0; i < 800; i++) {
         __NOP();
     }
 }
@@ -265,7 +279,9 @@ static void led_reset(void) {
  * 
  * @param data 
  */
-static void led_data_set(uint32_t data) {
+static inline void led_data_set(uint32_t data) {
+    LOGD(TAG, "led_data: 0x%06X", data);
+
     for (int8_t i = 0; i < 24; i++) {
         if (data & (0x800000)) {
             led_set_high();
@@ -287,6 +303,65 @@ static void led_color_set(uint8_t r, uint8_t g, uint8_t b) {
     led_data_set(((uint32_t)g << 16) | ((uint32_t)r << 8) | ((uint32_t)b));
 }
 
+static const union led_pack_t led_ref[][12] = {
+    {
+        {.color = {.r =   0, .g = 255, .b = 0}},
+        {.color = {.r =  33, .g = 222, .b = 0}},
+        {.color = {.r =  66, .g = 189, .b = 0}},
+        {.color = {.r =  99, .g = 156, .b = 0}},
+        {.color = {.r = 132, .g = 123, .b = 0}},
+        {.color = {.r = 165, .g = 100, .b = 0}},
+        {.color = {.r = 198, .g =  75, .b = 0}},
+        {.color = {.r = 231, .g =  50, .b = 0}},
+        {.color = {.r = 255, .g =  25, .b = 0}},
+        {.color = {.r = 255, .g =  12, .b = 0}},
+        {.color = {.r = 255, .g =   0, .b = 0}},
+        {.color = {.r = 255, .g =   0, .b = 0}},
+    },
+    {
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+        {.color = {.r = 255, .g = 0, .b = 0}},
+    },
+    {
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+        {.color = {.r = 0, .g = 255, .b = 0}},
+    },
+    {
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+        {.color = {.r = 0, .g = 0, .b = 255}},
+    },
+};
+
 /**
  * @brief 
  * 
@@ -294,38 +369,25 @@ static void led_color_set(uint8_t r, uint8_t g, uint8_t b) {
  * @param thro 
  */
 void thro_led_update(int16_t thro) {
-    // const uint8_t led_map_ref[12][3] = {
-    //     {50, 0, 0}, {0, 50, 0}, {0, 0, 100}, {50, 50, 50}, {50, 0, 0}, {0, 50, 0},
-    //     {0, 0, 100}, {50, 50, 50}, {50, 0, 0}, {0, 50, 0}, {0, 0, 100}, {50, 50, 50},
-    // };
-    // const uint8_t led_map_ref[12][3] = {
-    //     {255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {85, 85, 85}, {255, 0, 0}, {0, 255, 0}, 
-    //     {0, 0, 255}, {85, 85, 85}, {255, 0, 0}, {0, 255, 0}, {0, 0, 255}, {85, 85, 85}, 
-    // };
-    const uint8_t led_map_ref[12][3] = {
-        {0, 255, 0},  {22, 233, 0},  {45, 210, 0},  {68, 187, 0},
-        {90, 165, 0}, {113, 142, 0}, {136, 119, 0}, {158, 97, 0},
-        {181, 74, 0}, {204, 51, 0},  {227, 28, 0},  {255, 0, 0},
-    };
+    uint8_t idx = prj_cfg->bar_idx;
 
-    uint8_t led_map[3];
+    if (idx >= ARRAY_SIZE(led_ref)) {
+        LOGE(TAG, "Invalid bar idx: %d", idx);
+        idx = 0;
+    }
     thro = MAX(0, thro);
 
     uint8_t on = MIN((thro / 40), 12); // (500/12) = 41.66
     uint8_t off = 12 - on;
 
-    // on = 12;
-    // off = 0;
     LOGD(TAG, "thro: %d, on: %d, off: %d", thro, on, off);
 
     for (size_t i = 0; i < on; i++) {
-        memcpy(led_map, led_map_ref[i], sizeof(led_map));
-        led_color_set(led_map[0], led_map[1], led_map[2]);
+        led_data_set(led_ref[idx][i].data);
     }
 
-    memset(led_map, 0, sizeof(led_map));
     for (size_t i = 0; i < off; i++) {
-        led_color_set(led_map[0], led_map[1], led_map[2]);
+        led_data_set(0x000000);
     }
 
     led_reset();

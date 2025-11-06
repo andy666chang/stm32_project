@@ -32,6 +32,7 @@ static const prj_cfg_t default_cfg = {
     .center = 1500,
     .margin = 10,
     .mode = 0,
+    .bar_idx = 0,
 };
 
 static cfg_pack_t cfg_pack = {.check = 0x55};
@@ -66,7 +67,8 @@ void config_init(void) {
     LOGI(TAG, "  dir = %d", prj_cfg->dir);
     LOGI(TAG, "  center = %d", prj_cfg->center);
     LOGI(TAG, "  margin = %d", prj_cfg->margin);
-    LOGI(TAG, "  mode = %d\n", prj_cfg->mode);
+    LOGI(TAG, "  mode = %d", prj_cfg->mode);
+    LOGI(TAG, "  bar_idx = %d", prj_cfg->bar_idx);
 }
 
 void load_config(void) {
