@@ -23,10 +23,11 @@
 #define THRO_CALI_TIMEOUT  2000
 
 enum {
-    THRO_NONE = 0,
+    THRO_INPUT = 0,
     THRO_SHORT,
     THRO_LONG,
     THRO_FIRE,
+    THRO_BRAKE,
     THRO_UPDATE,
     THRO_CALI,
 };
@@ -63,6 +64,7 @@ void thro_service_process(void) {
 
     while (thro_buf.cnt) {
         ring_buf_pop(&thro_buf, (void *)&data);
+        event_cap |= BIT(THRO_INPUT);
 
         // Check calibration
         if (system_get_state() == SYSTEM_CALIBRATION) {
@@ -85,6 +87,14 @@ void thro_service_process(void) {
             LOGI(TAG, "THRO_SHORT");
             event_cap |= BIT(THRO_SHORT);
             short_timeout = log_timestamp();
+        }
+
+        // Check brake
+        if ((abs(pre_thro) < prj_cfg->margin) &&
+            (abs(thro) > prj_cfg->margin) &&
+            (thro < 0)) {
+            LOGI(TAG, "THRO_BRAKE");
+            event_cap |= BIT(THRO_BRAKE);
         }
 
         // Check long 
@@ -170,6 +180,23 @@ void thro_service_process(void) {
         }
     }
 
+    // Brake
+    if ((event_cap & BIT(THRO_BRAKE)) && (event_cap & BIT(THRO_INPUT))) {
+        // turn on tail led
+        led_tail_set(0, ON);
+        led_tail_set(1, ON);
+
+        if ((abs(thro) < prj_cfg->margin) || (thro > prj_cfg->margin)) {
+            // turn off tail led
+            if (sw_state == 0)
+                led_tail_set(0, OFF);
+            led_tail_set(1, OFF);
+
+            // Clear event
+            event_cap &= ~(BIT(THRO_BRAKE));
+        }
+    }
+
     // calibration
     if (event_cap & BIT(THRO_CALI)) {
         //  Capture center value
@@ -207,6 +234,7 @@ void thro_service_process(void) {
         event_cap &= ~(BIT(THRO_UPDATE));
     }
 
+    event_cap &= ~(BIT(THRO_INPUT));
     return;
 }
 
