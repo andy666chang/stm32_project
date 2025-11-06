@@ -35,15 +35,20 @@ struct shell_t shell_func_list[] = {
     SHELL_END,
 };
 
-
+static uint8_t idx = 0;
+static char tab[10] = {0};
 static void shell_dump(struct shell_t shell_list[]) {
     for (size_t i = 0; shell_list[i].func_name != NULL; i++) {
         if (shell_list[i].sub_shell) {
-            LOGI(TAG, "%s: %s", shell_list[i].func_name, shell_list[i].func_info);
+            LOGI(TAG, "%s%s: %s", tab, shell_list[i].func_name,
+                 shell_list[i].func_info);
+
+            tab[idx++] = '\t';
             shell_dump(shell_list[i].sub_shell);
-            LOGI(TAG, "");
+            tab[--idx] = '\0';
         } else {
-            LOGI(TAG, "%s - %s", shell_list[i].func_name, shell_list[i].func_info);
+            LOGI(TAG, "%s%s - %s", tab, shell_list[i].func_name,
+                 shell_list[i].func_info);
         }
     }
 }
