@@ -5,6 +5,7 @@
  * @Last Modified time: 2024-11-25 22:32:13 
  */
 
+#include <math.h>
 #include "interface.h"
 #include "../services/throttle/config.h"
 #include "gpio.h"
@@ -370,6 +371,8 @@ static const union led_pack_t led_ref[][12] = {
  */
 void thro_led_update(int16_t thro) {
     uint8_t idx = prj_cfg->bar_idx;
+    uint8_t step = ceil((prj_cfg->max - prj_cfg->center) / 12.0);
+    uint8_t on, off;
 
     if (idx >= ARRAY_SIZE(led_ref)) {
         LOGE(TAG, "Invalid bar idx: %d", idx);
@@ -377,8 +380,9 @@ void thro_led_update(int16_t thro) {
     }
     thro = MAX(0, thro);
 
-    uint8_t on = MIN((thro / 40), 12); // (500/12) = 41.66
-    uint8_t off = 12 - on;
+    on = MIN((thro / step), 12);
+    on = MAX(on, 0);
+    off = 12 - on;
 
     LOGD(TAG, "thro: %d, on: %d, off: %d", thro, on, off);
 
