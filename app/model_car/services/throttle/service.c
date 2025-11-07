@@ -242,7 +242,6 @@ void thro_service_process(void) {
     // Update throttle led bar
     if ((event_cap & BIT(THRO_UPDATE))) {
         thro_led_update(thro);
-        thro_led_update(thro); // update twice to avoid miss
         event_cap &= ~(BIT(THRO_UPDATE));
     }
 

@@ -304,63 +304,173 @@ static void led_color_set(uint8_t r, uint8_t g, uint8_t b) {
     led_data_set(((uint32_t)g << 16) | ((uint32_t)r << 8) | ((uint32_t)b));
 }
 
-static const union led_pack_t led_ref[][12] = {
+enum {
+    BAR_THRO = 0,
+    BAR_WHITE,
+    BAR_RED,
+    BAR_ORANGE,
+    BAR_YELLOW,
+    BAR_GREEN,
+    BAR_CYAN,
+    BAR_BLUE,
+    BAR_PURPLE,
+    BAR_PINK,
+
+    BAR_MAX,
+};
+
+static const union led_pack_t led_ref[BAR_MAX][12] =
     {
-        {.color = {.r =   0, .g = 255, .b = 0}},
-        {.color = {.r =  33, .g = 222, .b = 0}},
-        {.color = {.r =  66, .g = 189, .b = 0}},
-        {.color = {.r =  99, .g = 156, .b = 0}},
-        {.color = {.r = 132, .g = 123, .b = 0}},
-        {.color = {.r = 165, .g = 100, .b = 0}},
-        {.color = {.r = 198, .g =  75, .b = 0}},
-        {.color = {.r = 231, .g =  50, .b = 0}},
-        {.color = {.r = 255, .g =  25, .b = 0}},
-        {.color = {.r = 255, .g =  12, .b = 0}},
-        {.color = {.r = 255, .g =   0, .b = 0}},
-        {.color = {.r = 255, .g =   0, .b = 0}},
-    },
-    {
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-        {.color = {.r = 255, .g = 0, .b = 0}},
-    },
-    {
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-        {.color = {.r = 0, .g = 255, .b = 0}},
-    },
-    {
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-        {.color = {.r = 0, .g = 0, .b = 255}},
-    },
+        [BAR_THRO] =
+            {
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 33, .g = 222, .b = 0}},
+                {.color = {.r = 66, .g = 189, .b = 0}},
+                {.color = {.r = 99, .g = 156, .b = 0}},
+                {.color = {.r = 132, .g = 123, .b = 0}},
+                {.color = {.r = 165, .g = 100, .b = 0}},
+                {.color = {.r = 198, .g = 75, .b = 0}},
+                {.color = {.r = 231, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 25, .b = 0}},
+                {.color = {.r = 255, .g = 12, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+            },
+        [BAR_WHITE] =
+            {
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+                {.color = {.r = 80, .g = 80, .b = 80}},
+            },
+        [BAR_RED] =
+            {
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+                {.color = {.r = 255, .g = 0, .b = 0}},
+            },
+        [BAR_ORANGE] =
+            {
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+                {.color = {.r = 255, .g = 50, .b = 0}},
+            },
+        [BAR_YELLOW] =
+            {
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+                {.color = {.r = 200, .g = 80, .b = 0}},
+            },
+        [BAR_GREEN] =
+            {
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+                {.color = {.r = 0, .g = 255, .b = 0}},
+            },
+        [BAR_CYAN] =
+            {
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+                {.color = {.r = 0, .g = 40, .b =  40}},
+            },
+        [BAR_BLUE] =
+            {
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+                {.color = {.r = 0, .g = 0, .b = 255}},
+            },
+        [BAR_PURPLE] =
+            {
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+                {.color = {.r = 128, .g = 0, .b = 150}},
+            },
+        [BAR_PINK] =
+            {
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+                {.color = {.r = 200, .g = 0, .b = 30}},
+            },
 };
 
 uint8_t led_idx_max(void) {
@@ -375,7 +485,7 @@ uint8_t led_idx_max(void) {
  */
 void thro_led_update(int16_t thro) {
     uint8_t idx = prj_cfg->bar_idx;
-    uint8_t step = ceil((prj_cfg->max - prj_cfg->center) / 12.0);
+    uint8_t step = floorf((prj_cfg->max - prj_cfg->center) / 12.0);
     uint8_t on, off;
 
     if (idx >= ARRAY_SIZE(led_ref)) {
@@ -385,11 +495,12 @@ void thro_led_update(int16_t thro) {
     thro = MAX(0, thro);
 
     on = MIN((thro / step), 12);
-    on = MAX(on, 0);
+    on = MAX(on, 1);
     off = 12 - on;
 
     LOGD(TAG, "thro: %d, on: %d, off: %d", thro, on, off);
 
+    __disable_irq();
     for (size_t i = 0; i < on; i++) {
         led_data_set(led_ref[idx][i].data);
     }
@@ -397,6 +508,7 @@ void thro_led_update(int16_t thro) {
     for (size_t i = 0; i < off; i++) {
         led_data_set(0x000000);
     }
+    __enable_irq();
 
     led_reset();
 }
