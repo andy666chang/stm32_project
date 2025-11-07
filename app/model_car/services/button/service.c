@@ -143,6 +143,11 @@ void btn_service_process(void) {
         pre_btn = data;
     }
 
+    // Remove initial noise
+    if (log_timestamp() <= 2000) {
+        cnt = 0;
+    }
+
     // Count timeout
     if ((log_timestamp() - time) >= BTN_TIMEOUT &&
         cnt) {
