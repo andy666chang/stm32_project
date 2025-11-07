@@ -44,7 +44,7 @@ void HAL_GPIO_EXTI_Falling_Callback(uint16_t GPIO_Pin)
     uint16_t *time_ptr = NULL;
     void (*func)(uint16_t) = NULL;
 
-    // LOGI(TAG, "diff = %d", diff);
+    LOGD(TAG, "diff = %d", diff);
 
     // Measure the pulse time
     switch (GPIO_Pin) {
