@@ -161,6 +161,7 @@ void btn_service_process(void) {
                 if (prj_cfg->bar_idx >= led_idx_max()) {
                     prj_cfg->bar_idx = 0;
                 }
+                thro_led_update(prj_cfg->max);
                 LOGI(TAG, "Select bar idx: %d", prj_cfg->bar_idx);
             } else {
                 LOGI(TAG, "BTN_SWITCH");
@@ -191,6 +192,7 @@ void btn_service_process(void) {
             LOGI(TAG, "BTN_LED_SEL");
             if (system_get_state() == SYSTEM_NORMAL) {
                 system_set_state(SYSTEM_LED_SELECT);
+                thro_led_update(prj_cfg->max);
             } else if (system_get_state() == SYSTEM_LED_SELECT) {
                 save_config();
                 system_set_state(SYSTEM_NORMAL);

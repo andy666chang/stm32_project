@@ -30,7 +30,6 @@ enum {
     THRO_LONG,
     THRO_FIRE,
     THRO_BRAKE,
-    THRO_UPDATE,
     THRO_CALI,
 };
 
@@ -191,7 +190,6 @@ void thro_service_process(void) {
 
     while (thro_buf.cnt) {
         ring_buf_pop(&thro_buf, (void *)&data);
-        event_cap |= BIT(THRO_INPUT);
 
         // Check calibration
         if (system_get_state() == SYSTEM_CALIBRATION) {
@@ -201,7 +199,6 @@ void thro_service_process(void) {
             }
             break;
         } else if (system_get_state() == SYSTEM_LED_SELECT) {
-            thro_led_update(prj_cfg->max);
             break;
         }
 
@@ -251,13 +248,10 @@ void thro_service_process(void) {
             fire_timeout = log_timestamp();
         }
 
-        // Check thro update
-        if (prj_cfg->mode == 1) {
-            event_cap |= BIT(THRO_UPDATE);
-        }
-
         // Record thro state
         pre_thro = thro;
+
+        event_cap |= BIT(THRO_INPUT);
     }
 
     /* Check throttle event */
@@ -288,9 +282,12 @@ void thro_service_process(void) {
     }
 
     // Update throttle led bar
-    if ((event_cap & BIT(THRO_UPDATE))) {
-        thro_led_update(thro);
-        event_cap &= ~(BIT(THRO_UPDATE));
+    if (prj_cfg->mode == 1 && (event_cap & BIT(THRO_INPUT))) {
+        if (event_cap & BIT(THRO_BRAKE)) {
+            thro_led_brake();
+        } else {
+            thro_led_update(thro);
+        }
     }
 
     event_cap &= ~(BIT(THRO_INPUT));

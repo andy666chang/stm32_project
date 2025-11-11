@@ -308,6 +308,7 @@ enum {
     BAR_THRO = 0,
     BAR_WHITE,
     BAR_RED,
+    BAR_BRAKE = BAR_RED,
     BAR_ORANGE,
     BAR_YELLOW,
     BAR_GREEN,
@@ -507,6 +508,23 @@ void thro_led_update(int16_t thro) {
 
     for (size_t i = 0; i < off; i++) {
         led_data_set(0x000000);
+    }
+    __enable_irq();
+
+    led_reset();
+}
+
+/**
+ * @brief 
+ * 
+ * 
+ * @param thro 
+ */
+void thro_led_brake(void) {
+
+    __disable_irq();
+    for (size_t i = 0; i < 12; i++) {
+        led_data_set(led_ref[BAR_BRAKE][i].data);
     }
     __enable_irq();
 
