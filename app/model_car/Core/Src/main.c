@@ -96,7 +96,7 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
   log_route(HAL_GetTick);
-  LOGI(TAG, "");
+  // LOGI(TAG, "");
   LOGI(TAG, "Hello JSK studio!");
   LOGI(TAG, "Build time: %s %s", __DATE__, __TIME__);
   btn_servic_init();
