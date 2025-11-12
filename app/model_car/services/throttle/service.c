@@ -17,9 +17,11 @@
 #include "system.h"
 
 #define TAG "THRO"
-#define THRO_SHORT_TIMEOUT  300
+#define THRO_SHORT_TIMEOUT 300
 #define THRO_LONG_TIMEOUT  1000
-#define THRO_FIRE_TIMEOUT    50
+#define THRO_FIRE_TIMEOUT  50
+#define THRO_WAIT_TIMEOUT  3000
+#define BLINK_TIMEOUT      500
 #define THRO_CALI_STEP1    2000
 #define THRO_CALI_STEP2    (2 * THRO_CALI_STEP1)
 #define THRO_CALI_TIMEOUT  (5 * THRO_CALI_STEP1)
@@ -29,6 +31,7 @@ enum {
     THRO_SHORT,
     THRO_LONG,
     THRO_FIRE,
+    THRO_WAIT,
     THRO_BRAKE,
     THRO_CALI,
 };
@@ -44,11 +47,13 @@ static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
 extern uint8_t sw_state;
+extern bool led_stop_blink;
 
 static uint16_t event_cap = 0;
 static uint32_t short_timeout;
 static uint32_t long_timeout;
 static uint32_t fire_timeout;
+static uint32_t wait_timeout;
 static uint32_t cali_time; // Record time stamp for calibration
 static int16_t pre_thro = 0;
 static int16_t thro = 0;
@@ -120,6 +125,37 @@ static inline void thro_fire(void) {
     } else if (duration < THRO_FIRE_TIMEOUT) {
         // turn on fire led
         led_fire_set(ON);
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_blink_wait(void) {
+    static uint32_t blink_time = 0;
+    static bool led_state = 0;
+
+    if ((abs(thro) > prj_cfg->margin) || (led_stop_blink == false)) {
+        // Cancel wait
+        event_cap &= ~BIT(THRO_WAIT);
+        led_chasis_set(OFF);
+        led_state = OFF;
+
+        // Recover led btn status
+        if (led_stop_blink == false) {
+            if (sw_state == 0)
+                led_chasis_set(OFF);
+            else
+                led_chasis_set(ON);
+        }
+    } else if (log_timestamp() - wait_timeout >= THRO_WAIT_TIMEOUT) {
+        // led blink
+        if ((log_timestamp() - blink_time) >= BLINK_TIMEOUT) {
+            led_state = !led_state;
+            led_chasis_set(led_state);
+            blink_time = log_timestamp();
+        }
     }
 }
 
@@ -248,6 +284,14 @@ void thro_service_process(void) {
             fire_timeout = log_timestamp();
         }
 
+        // Check stop blink led
+        if (led_stop_blink && ((event_cap & BIT(THRO_WAIT)) == 0)) {
+            if (abs(thro) < prj_cfg->margin) {
+                wait_timeout = log_timestamp();
+                event_cap |= BIT(THRO_WAIT);
+            }
+        }
+
         // Record thro state
         pre_thro = thro;
 
@@ -268,6 +312,11 @@ void thro_service_process(void) {
     // fire
     if (event_cap & BIT(THRO_FIRE)) {
         thro_fire();
+    }
+
+    // wait
+    if ((event_cap & BIT(THRO_WAIT)) && (event_cap & BIT(THRO_INPUT))) {
+        thro_blink_wait();
     }
 
     // Brake

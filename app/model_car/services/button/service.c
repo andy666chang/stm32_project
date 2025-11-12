@@ -46,9 +46,8 @@ void btn_data_push(uint16_t data) {
 }
 
 uint8_t sw_state = 0;
+bool led_stop_blink = false;
 static bool beam_state = 0;
-
-static void (*sub_process)(void) = NULL;
 
 static void btn_switch(void) {
     sw_state++;
@@ -100,16 +99,6 @@ static void btn_high_beam(void) {
             led_head_set(0, ON);
         else
             led_head_set(0, OFF);
-    }
-}
-
-static void btn_led_flash(void) {
-    static uint32_t flash_time = 0;
-    static bool led_state = 0;
-    if ((log_timestamp() - flash_time) >= FLASH_TIMEOUT) {
-        led_chasis_set(led_state);
-        led_state = !led_state;
-        flash_time = log_timestamp();
     }
 }
 
@@ -176,15 +165,15 @@ void btn_service_process(void) {
 
         case BTN_FALSH: // LED Flash
             LOGI(TAG, "BTN_FLASH");
-            if (sub_process == btn_led_flash) {
+            if (led_stop_blink) {
                 if (sw_state == 0)
                     led_chasis_set(OFF);
                 else 
                     led_chasis_set(ON);
 
-                sub_process = NULL;
-            } else if (sub_process == NULL) {
-                sub_process = btn_led_flash;
+                led_stop_blink = false;
+            } else {
+                led_stop_blink = true;
             }
             break;
         
@@ -235,10 +224,6 @@ void btn_service_process(void) {
         }
 
         cnt = 0;
-    }
-
-    if (sub_process) {
-        sub_process();
     }
     
     return;
