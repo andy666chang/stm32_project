@@ -315,12 +315,12 @@ void thro_service_process(void) {
     }
 
     // wait
-    if ((event_cap & BIT(THRO_WAIT)) && (event_cap & BIT(THRO_INPUT))) {
+    if ((event_cap & (BIT(THRO_WAIT) || BIT(THRO_INPUT)))) {
         thro_blink_wait();
     }
 
     // Brake
-    if ((event_cap & BIT(THRO_BRAKE)) && (event_cap & BIT(THRO_INPUT))) {
+    if ((event_cap & (BIT(THRO_BRAKE) || BIT(THRO_INPUT)))) {
         thro_brake();
     }
 

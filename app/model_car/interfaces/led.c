@@ -534,6 +534,24 @@ void thro_led_brake(void) {
 /**
  * @brief 
  * 
+ * @param r 
+ * @param g 
+ * @param b 
+ */
+void thro_led_set(uint8_t r, uint8_t g, uint8_t b) {
+
+    __disable_irq();
+    for (size_t i = 0; i < 12; i++) {
+        led_color_set(r, g, b);
+    }
+    __enable_irq();
+
+    led_reset();
+}
+
+/**
+ * @brief 
+ * 
  * @return int 
  */
 int led_init(void) {

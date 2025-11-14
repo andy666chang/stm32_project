@@ -18,6 +18,7 @@
 #include "shell_btn.h"
 #include "shell_thro.h"
 #include "shell_config.h"
+#include "shell_led_bar.h"
 
 #include "components/log/log.h"
 
@@ -32,6 +33,7 @@ struct shell_t shell_func_list[] = {
     SHELL_BTN,
     SHELL_THRO,
     SHELL_CFG,
+    SHELL_LED_BAR,
     SHELL_END,
 };
 
