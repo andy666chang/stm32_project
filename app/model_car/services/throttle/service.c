@@ -187,17 +187,13 @@ static inline void thro_cali(void) {
     //  Capture center value
     if ((log_timestamp() - cali_time) < THRO_CALI_STEP1) {
         //  Capture center value
-        if ((event_cap & BIT(THRO_INPUT))) {
-            prj_cfg->center = data;
-        }
+        prj_cfg->center = data;
 
         led_tail_set(0, ON);
         led_tail_set(1, ON);
     } else if ((log_timestamp() - cali_time) < THRO_CALI_STEP2) {
         //  Capture max value
-        if ((event_cap & BIT(THRO_INPUT))) {
-            prj_cfg->max = data;
-        }
+        prj_cfg->max = data;
 
         led_fire_set(ON);
     } else {
