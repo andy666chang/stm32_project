@@ -195,16 +195,16 @@ void btn_service_process(void) {
             }
             break;
 
-        case BTN_DIR: // Switch direction
-            LOGI(TAG, "BTN_DIR");
-            prj_cfg->dir = -prj_cfg->dir;
-            LOGI(TAG, "dir = %d", prj_cfg->dir);
-            save_config();
+        // case BTN_DIR: // Switch direction
+        //     LOGI(TAG, "BTN_DIR");
+        //     prj_cfg->dir = -prj_cfg->dir;
+        //     LOGI(TAG, "dir = %d", prj_cfg->dir);
+        //     save_config();
 
-            // Restart
-            HAL_Delay(100);
-            HAL_NVIC_SystemReset();
-            break;
+        //     // Restart
+        //     HAL_Delay(100);
+        //     HAL_NVIC_SystemReset();
+        //     break;
 
         case BTN_MODE: // Switch mode
             LOGI(TAG, "BTN_MODE");

@@ -486,7 +486,7 @@ uint8_t led_idx_max(void) {
  */
 void thro_led_update(int16_t thro) {
     uint8_t idx = prj_cfg->bar_idx;
-    uint8_t step = floorf((prj_cfg->max - prj_cfg->center) / 12.0);
+    uint8_t step = floorf(fabs(prj_cfg->max - prj_cfg->center) / 12.0);
     uint8_t on, off;
 
     if (idx >= ARRAY_SIZE(led_ref)) {
