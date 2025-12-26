@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 16:37:57
+ * @Last Modified time: 2025-12-26 16:45:12
  */
 
 #include "service.h"
@@ -210,9 +210,9 @@ void btn_service_process(void) {
             save_config();
 
             if (prj_cfg->mode == 1) {
-                led_string_set(ON);
+                led_bar_set(ON);
             } else {
-                led_string_set(OFF);
+                led_bar_set(OFF);
             }
             break;
 
