@@ -197,8 +197,17 @@ static inline void thro_cali(void) {
 
         led_fire_set(ON);
     } else {
+
+        if (prj_cfg->max >= prj_cfg->center) {
+            prj_cfg->dir = 1;
+        } else {
+            prj_cfg->dir = -1;
+        }
+
         LOGI(TAG, "center = %d", prj_cfg->center);
         LOGI(TAG, "max = %d", prj_cfg->max);
+        LOGI(TAG, "dir = %d", prj_cfg->dir);
+
         save_config();
 
         // Exit calibration mode
