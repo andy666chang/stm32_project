@@ -31,6 +31,10 @@ static const prj_cfg_t default_cfg = {
     .dir = 1,
     .center = 1500,
     .margin = 10,
+    .max = 2000,
+    
+    .mode = 0,
+    .bar_idx = 0,
 };
 
 static cfg_pack_t cfg_pack = {.check = 0x55};
@@ -48,6 +52,7 @@ void config_init(void) {
     if (cfg_pack.check != MAGIC) {
         // Replace by default config
         LOGW(TAG, "Invalid data in flash, reset to default");
+        memset(&cfg_pack, 0, sizeof(cfg_pack_t));
         memcpy(&cfg_pack.pack.cfg, &default_cfg, sizeof(prj_cfg_t));
         cfg_pack.check = MAGIC;
 
@@ -59,11 +64,7 @@ void config_init(void) {
     prj_cfg = &cfg_pack.pack.cfg;
 
     // Dump config
-    LOGI(TAG, "prj_cfg:");
-    LOGI(TAG, "  version = %d", prj_cfg->version);
-    LOGI(TAG, "  dir = %d", prj_cfg->dir);
-    LOGI(TAG, "  center = %d", prj_cfg->center);
-    LOGI(TAG, "  margin = %d\n", prj_cfg->margin);
+    dump_config();
 }
 
 void load_config(void) {
@@ -77,4 +78,15 @@ void save_config(void) {
     // Erase and write to flash
     flash_erase(CFG_ADDR, sizeof(cfg_pack_t));
     flash_write(CFG_ADDR, (uint8_t *)&cfg_pack, sizeof(cfg_pack_t));
+}
+
+void dump_config(void) {
+    LOGI(TAG, "prj_cfg:");
+    LOGI(TAG, "  version = %d", prj_cfg->version);
+    LOGI(TAG, "  dir = %d", prj_cfg->dir);
+    LOGI(TAG, "  center = %d", prj_cfg->center);
+    LOGI(TAG, "  margin = %d", prj_cfg->margin);
+    LOGI(TAG, "  max = %d", prj_cfg->max);
+    LOGI(TAG, "  mode = %d", prj_cfg->mode);
+    LOGI(TAG, "  bar_idx = %d", prj_cfg->bar_idx);
 }

@@ -29,6 +29,16 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32g0xx_hal.h"
 
+#include "stm32g0xx_ll_system.h"
+#include "stm32g0xx_ll_gpio.h"
+#include "stm32g0xx_ll_exti.h"
+#include "stm32g0xx_ll_bus.h"
+#include "stm32g0xx_ll_cortex.h"
+#include "stm32g0xx_ll_rcc.h"
+#include "stm32g0xx_ll_utils.h"
+#include "stm32g0xx_ll_pwr.h"
+#include "stm32g0xx_ll_dma.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -57,19 +67,21 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TP1_Pin GPIO_PIN_14
+#define TP1_Pin LL_GPIO_PIN_14
 #define TP1_GPIO_Port GPIOC
-#define FIRE_Pin GPIO_PIN_4
+#define SW_Pin LL_GPIO_PIN_0
+#define SW_GPIO_Port GPIOA
+#define FIRE_Pin LL_GPIO_PIN_4
 #define FIRE_GPIO_Port GPIOA
-#define TAIL_1_Pin GPIO_PIN_5
+#define TAIL_1_Pin LL_GPIO_PIN_5
 #define TAIL_1_GPIO_Port GPIOA
-#define TAIL_0_Pin GPIO_PIN_6
+#define TAIL_0_Pin LL_GPIO_PIN_6
 #define TAIL_0_GPIO_Port GPIOA
-#define CHASIS_Pin GPIO_PIN_7
+#define CHASIS_Pin LL_GPIO_PIN_7
 #define CHASIS_GPIO_Port GPIOA
-#define HEAD_1_Pin GPIO_PIN_0
+#define HEAD_1_Pin LL_GPIO_PIN_0
 #define HEAD_1_GPIO_Port GPIOB
-#define HEAD_0_Pin GPIO_PIN_1
+#define HEAD_0_Pin LL_GPIO_PIN_1
 #define HEAD_0_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */

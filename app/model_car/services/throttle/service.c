@@ -14,16 +14,27 @@
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
+#include "system.h"
 
 #define TAG "THRO"
-#define THRO_SHORT_TIMEOUT  500
+#define THRO_SHORT_TIMEOUT 300
 #define THRO_LONG_TIMEOUT  1000
-#define THRO_FIRE_TIMEOUT   500
+#define THRO_FIRE_TIMEOUT  50
+#define THRO_WAIT_TIMEOUT  3000
+#define BLINK_TIMEOUT      500
+#define THRO_CALI_STEP1    2000
+#define THRO_CALI_STEP2    (2 * THRO_CALI_STEP1)
+#define THRO_CALI_TIMEOUT  (5 * THRO_CALI_STEP1)
 
-#define THRO_NONE   0
-#define THRO_SHORT  1
-#define THRO_LONG   2
-#define THRO_FIRE   3
+enum {
+    THRO_INPUT = 0,
+    THRO_SHORT,
+    THRO_LONG,
+    THRO_FIRE,
+    THRO_WAIT,
+    THRO_BRAKE,
+    THRO_CALI,
+};
 
 #define BIT(n) (UINT32_C(1) << (n))
 
@@ -36,7 +47,17 @@ static uint16_t thro_buf_data[10];
 static struct ring_buf thro_buf;
 
 extern uint8_t sw_state;
-extern uint8_t cali_state;
+extern bool led_stop_blink;
+
+static uint16_t event_cap = 0;
+static uint32_t short_timeout;
+static uint32_t long_timeout;
+static uint32_t fire_timeout;
+static uint32_t wait_timeout;
+static uint32_t cali_time; // Record time stamp for calibration
+static int16_t pre_thro = 0;
+static int16_t thro = 0;
+static uint16_t data = 0;
 
 void thro_data_push(uint16_t data) {
     ring_buf_push(&thro_buf, (void *)&data);
@@ -46,18 +67,179 @@ void thro_data_push(uint16_t data) {
  * @brief 
  * 
  */
+static inline void thro_short(void) {
+    // turn on tail led
+    led_tail_set(0, ON);
+    led_tail_set(1, ON);
+
+    if ((log_timestamp() - short_timeout) > THRO_SHORT_TIMEOUT) {
+        // turn off tail led
+        if (sw_state == 0)
+            led_tail_set(0, OFF);
+        led_tail_set(1, OFF);
+
+        // Clear event
+        event_cap &= ~(BIT(THRO_SHORT));
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_long(void) {
+    // turn on tail led
+    led_tail_set(0, ON);
+    led_tail_set(1, ON);
+
+    if ((log_timestamp() - long_timeout) > THRO_LONG_TIMEOUT) {
+        // turn off tail led
+        if (sw_state == 0)
+            led_tail_set(0, OFF);
+        led_tail_set(1, OFF);
+
+        // Clear event
+        event_cap &= ~(BIT(THRO_LONG));
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_fire(void) {
+    uint32_t duration = log_timestamp() - fire_timeout;
+
+    if (duration > 3 * THRO_FIRE_TIMEOUT) {
+        // turn off fire led
+        led_fire_set(OFF);
+
+        // Clear event
+        event_cap &= ~(BIT(THRO_FIRE));
+    } else if (duration > 2 * THRO_FIRE_TIMEOUT) {
+        // turn off fire led
+        led_fire_set(ON);
+    } else if (duration > 1 * THRO_FIRE_TIMEOUT) {
+        // turn off fire led
+        led_fire_set(OFF);
+    } else if (duration < THRO_FIRE_TIMEOUT) {
+        // turn on fire led
+        led_fire_set(ON);
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_blink_wait(void) {
+    static uint32_t blink_time = 0;
+    static bool led_state = 0;
+
+    if ((abs(thro) > prj_cfg->margin) || (led_stop_blink == false)) {
+        // Cancel wait
+        event_cap &= ~BIT(THRO_WAIT);
+        led_chasis_set(OFF);
+        led_state = OFF;
+
+        // Recover led btn status
+        if (led_stop_blink == false) {
+            if (sw_state == 0)
+                led_chasis_set(OFF);
+            else
+                led_chasis_set(ON);
+        }
+    } else if (log_timestamp() - wait_timeout >= THRO_WAIT_TIMEOUT) {
+        // led blink
+        if ((log_timestamp() - blink_time) >= BLINK_TIMEOUT) {
+            led_state = !led_state;
+            led_chasis_set(led_state);
+            blink_time = log_timestamp();
+        }
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_brake(void) {
+    // turn on tail led
+    led_tail_set(0, ON);
+    led_tail_set(1, ON);
+
+    if ((abs(thro) < prj_cfg->margin) || (thro > prj_cfg->margin)) {
+        // turn off tail led
+        if (sw_state == 0)
+            led_tail_set(0, OFF);
+        led_tail_set(1, OFF);
+
+        // Clear event
+        event_cap &= ~(BIT(THRO_BRAKE));
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
+static inline void thro_cali(void) {
+    //  Capture center value
+    if ((log_timestamp() - cali_time) < THRO_CALI_STEP1) {
+        //  Capture center value
+        prj_cfg->center = data;
+
+        led_tail_set(0, ON);
+        led_tail_set(1, ON);
+    } else if ((log_timestamp() - cali_time) < THRO_CALI_STEP2) {
+        //  Capture max value
+        prj_cfg->max = data;
+
+        led_fire_set(ON);
+    } else {
+
+        if (prj_cfg->max >= prj_cfg->center) {
+            prj_cfg->dir = 1;
+        } else {
+            prj_cfg->dir = -1;
+        }
+
+        LOGI(TAG, "center = %d", prj_cfg->center);
+        LOGI(TAG, "max = %d", prj_cfg->max);
+        LOGI(TAG, "dir = %d", prj_cfg->dir);
+
+        save_config();
+
+        // Exit calibration mode
+        system_set_state(SYSTEM_NORMAL);
+        LOGI(TAG, "Exit calibration mode");
+
+        // Clear event
+        event_cap &= ~(BIT(THRO_CALI));
+
+        // Restart
+        HAL_Delay(100);
+        HAL_NVIC_SystemReset();
+    }
+}
+
+/**
+ * @brief 
+ * 
+ */
 void thro_service_process(void) {
-    static int16_t pre_thro = 0;
-    static uint8_t event_cap = 0;
-    static uint32_t short_timeout, long_timeout, fire_timeout;
-    int16_t thro = 0;
 
     while (thro_buf.cnt) {
-        uint16_t data = 0;
         ring_buf_pop(&thro_buf, (void *)&data);
 
-        if (cali_state) {
-            prj_cfg->center = data;
+        // Check calibration
+        if (system_get_state() == SYSTEM_CALIBRATION) {
+            if ((event_cap & BIT(THRO_CALI)) == 0) {
+                event_cap |= BIT(THRO_CALI);
+                cali_time = log_timestamp();
+            }
+            break;
+        } else if (system_get_state() == SYSTEM_LED_SELECT) {
             break;
         }
 
@@ -67,6 +249,9 @@ void thro_service_process(void) {
         LOGD(TAG, "Throttle signal: %d", thro); // 1500 +- 544 in each 15ms
 
         // Check short 
+        //   throttle decrease
+        //   throttle change larger than margin
+        //   throttle larger than center
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro-pre_thro) > prj_cfg->margin) &&
             (abs(thro) > prj_cfg->margin)) {
@@ -75,16 +260,28 @@ void thro_service_process(void) {
             short_timeout = log_timestamp();
         }
 
-        // Check long 
-        if ((abs(thro) < abs(pre_thro)) &&
-            (abs(thro-pre_thro) > prj_cfg->margin) &&
-            (abs(thro) < prj_cfg->margin)) {
-            LOGI(TAG, "THRO_LONG");
-            event_cap |= BIT(THRO_LONG);
-            long_timeout = log_timestamp();
+        // Check brake
+        //   previous throttle in center
+        //   throttle is negative
+        if ((abs(pre_thro) < prj_cfg->margin) &&
+            (abs(thro) > prj_cfg->margin) &&
+            (thro < 0)) {
+            LOGI(TAG, "THRO_BRAKE");
+            event_cap |= BIT(THRO_BRAKE);
         }
 
-        // Check fire 
+        // Check long 
+        // if ((abs(thro) < abs(pre_thro)) &&
+        //     (abs(thro-pre_thro) > prj_cfg->margin) &&
+        //     (abs(thro) < prj_cfg->margin)) {
+        //     LOGI(TAG, "THRO_LONG");
+        //     event_cap |= BIT(THRO_LONG);
+        //     long_timeout = log_timestamp();
+        // }
+
+        // Check fire
+        //   previous throttle larger than margin
+        //   throttle in center
         if ((pre_thro > prj_cfg->margin) &&
             (abs(thro) < prj_cfg->margin)) {
             LOGI(TAG, "THRO_FIRE");
@@ -92,60 +289,62 @@ void thro_service_process(void) {
             fire_timeout = log_timestamp();
         }
 
-        
+        // Check stop blink led
+        if (led_stop_blink && ((event_cap & BIT(THRO_WAIT)) == 0)) {
+            if (abs(thro) < prj_cfg->margin) {
+                wait_timeout = log_timestamp();
+                event_cap |= BIT(THRO_WAIT);
+            }
+        }
+
         // Record thro state
         pre_thro = thro;
+
+        event_cap |= BIT(THRO_INPUT);
     }
 
     /* Check throttle event */
     // short 
     if (event_cap & BIT(THRO_SHORT)) {
-        // turn on tail led
-        led_tail_set(0, ON);
-        led_tail_set(1, ON);
-
-        if ( (log_timestamp() - short_timeout) > THRO_SHORT_TIMEOUT ) {
-            // turn off tail led
-            if (sw_state == 0)
-                led_tail_set(0, OFF);
-            led_tail_set(1, OFF);
-            
-            // Clear event
-            event_cap &= ~(BIT(THRO_SHORT));
-        }
+        thro_short();
     }
 
     // long
-    if (event_cap & BIT(THRO_LONG)) {
-        // turn on tail led
-        led_tail_set(0, ON);
-        led_tail_set(1, ON);
-
-        if ( (log_timestamp() - long_timeout) > THRO_LONG_TIMEOUT ) {
-            // turn off tail led
-            if (sw_state == 0)
-                led_tail_set(0, OFF);
-            led_tail_set(1, OFF);
-            
-            // Clear event
-            event_cap &= ~(BIT(THRO_LONG));
-        }
-    }
+    // if (event_cap & BIT(THRO_LONG)) {
+    //     thro_long();
+    // }
 
     // fire
     if (event_cap & BIT(THRO_FIRE)) {
-        // turn on fire led
-        led_fire_set(ON);
+        thro_fire();
+    }
 
-        if ( (log_timestamp() - fire_timeout) > THRO_FIRE_TIMEOUT ) {
-            // turn off fire led
-            led_fire_set(OFF);
-            
-            // Clear event
-            event_cap &= ~(BIT(THRO_FIRE));
+    // wait
+    if ((event_cap & (BIT(THRO_WAIT) || BIT(THRO_INPUT)))) {
+        thro_blink_wait();
+    }
+
+    // Brake
+    if ((event_cap & (BIT(THRO_BRAKE) || BIT(THRO_INPUT)))) {
+        thro_brake();
+    }
+
+    // calibration
+    if ((event_cap & BIT(THRO_CALI)) &&
+        (log_timestamp() - cali_time) < THRO_CALI_TIMEOUT) {
+        thro_cali();
+    }
+
+    // Update throttle led bar
+    if (prj_cfg->mode == 1 && (event_cap & BIT(THRO_INPUT))) {
+        if (event_cap & BIT(THRO_BRAKE)) {
+            thro_led_brake();
+        } else {
+            thro_led_update(thro);
         }
     }
 
+    event_cap &= ~(BIT(THRO_INPUT));
     return;
 }
 

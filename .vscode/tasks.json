@@ -73,8 +73,8 @@
             "command": "openocd",
             "args": [
                 "-f",
-                "tools/openocd/interface/stlink-v2-1.cfg",
-                // "tools/openocd/interface/cmsis-dap.cfg",
+                // "tools/openocd/interface/stlink-v2-1.cfg",
+                "tools/openocd/interface/cmsis-dap.cfg",
                 "-f",
                 "tools/openocd/target/stm32g0x.cfg",
                 "-c",

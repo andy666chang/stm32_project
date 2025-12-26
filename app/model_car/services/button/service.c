@@ -15,9 +15,10 @@
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"
+#include "system.h"
 
 #define TAG "BTN"
-#define BTN_TIMEOUT 300
+#define BTN_TIMEOUT 750
 #define FLASH_TIMEOUT 500
 #define CALI_TIMEOUT 1500
 
@@ -25,28 +26,28 @@
 #define BTN_SWITCH      1
 #define BTN_HIGH_BEAM   2
 #define BTN_FALSH       3
+#define BTN_LED_SEL     4
 #define BTN_CALI        6
+#define BTN_MODE        7
 #define BTN_DIR         9
 
 #define ON 1
 #define OFF 0
 #define RC_MAX 2000
 #define RC_MIN 1000
+#define RC_CENTER 1500
 
 static uint16_t btn_buf_data[10];
 static struct ring_buf btn_buf;
 static uint32_t time = 0; // Record time stamp for fast click
-static uint32_t cali_time = 0; // Record time stamp for calibration
 
 void btn_data_push(uint16_t data) {
     ring_buf_push(&btn_buf, (void *)&data);
 }
 
 uint8_t sw_state = 0;
-uint8_t cali_state = 0;
+bool led_stop_blink = false;
 static bool beam_state = 0;
-
-static void (*sub_process)(void) = NULL;
 
 static void btn_switch(void) {
     sw_state++;
@@ -101,26 +102,6 @@ static void btn_high_beam(void) {
     }
 }
 
-static void btn_led_flash(void) {
-    static uint32_t flash_time = 0;
-    static bool led_state = 0;
-    if ((log_timestamp() - flash_time) >= FLASH_TIMEOUT) {
-        led_chasis_set(led_state);
-        led_state = !led_state;
-        flash_time = log_timestamp();
-    }
-}
-
-static void btn_cali(void) {
-    if ((log_timestamp() - cali_time) >= CALI_TIMEOUT) {
-        LOGI(TAG, "center = %d", prj_cfg->center);
-        LOGI(TAG, "BTN_CALI finish");
-        save_config();
-        cali_state = 0;
-        sub_process = NULL;
-    }
-}
-
 /**
  * @brief 
  * 
@@ -134,7 +115,7 @@ void btn_service_process(void) {
         ring_buf_pop(&btn_buf, (void *)&data);
 
         LOGD(TAG, "Button signal: %d", data); // 978 or 2045 in each 15ms
-        if (data >= prj_cfg->center) {
+        if (data >= RC_CENTER) {
             data = RC_MAX;
         } else {
             data = RC_MIN;
@@ -151,6 +132,11 @@ void btn_service_process(void) {
         pre_btn = data;
     }
 
+    // Remove initial noise
+    if (log_timestamp() <= 2000) {
+        cnt = 0;
+    }
+
     // Count timeout
     if ((log_timestamp() - time) >= BTN_TIMEOUT &&
         cnt) {
@@ -159,8 +145,17 @@ void btn_service_process(void) {
         // Send event
         switch (cnt) {
         case BTN_SWITCH: // Switch on/off
-            LOGI(TAG, "BTN_SWITCH");
-            btn_switch();
+            if (system_get_state() == SYSTEM_LED_SELECT) {
+                prj_cfg->bar_idx++;
+                if (prj_cfg->bar_idx >= led_idx_max()) {
+                    prj_cfg->bar_idx = 0;
+                }
+                thro_led_update(prj_cfg->max);
+                LOGI(TAG, "Select bar idx: %d", prj_cfg->bar_idx);
+            } else {
+                LOGI(TAG, "BTN_SWITCH");
+                btn_switch();
+            }
             break;
 
         case BTN_HIGH_BEAM: // High beam
@@ -170,26 +165,58 @@ void btn_service_process(void) {
 
         case BTN_FALSH: // LED Flash
             LOGI(TAG, "BTN_FLASH");
-            if (sub_process == btn_led_flash) {
-                led_chasis_set(OFF);
-                sub_process = NULL;
-            } else if (sub_process == NULL) {
-                sub_process = btn_led_flash;
+            if (led_stop_blink) {
+                if (sw_state == 0)
+                    led_chasis_set(OFF);
+                else 
+                    led_chasis_set(ON);
+
+                led_stop_blink = false;
+            } else {
+                led_stop_blink = true;
+            }
+            break;
+        
+        case BTN_LED_SEL:
+            LOGI(TAG, "BTN_LED_SEL");
+            if (system_get_state() == SYSTEM_NORMAL) {
+                system_set_state(SYSTEM_LED_SELECT);
+                thro_led_update(prj_cfg->max);
+            } else if (system_get_state() == SYSTEM_LED_SELECT) {
+                save_config();
+                system_set_state(SYSTEM_NORMAL);
             }
             break;
 
         case BTN_CALI: // Calibration
             LOGI(TAG, "BTN_CALI");
-            cali_state = 1;
-            cali_time = log_timestamp();
-            sub_process = btn_cali;
+            if (system_get_state() == SYSTEM_NORMAL) {
+                system_set_state(SYSTEM_CALIBRATION);
+            }
             break;
 
-        case BTN_DIR: // Switch direction
-            LOGI(TAG, "BTN_DIR");
-            prj_cfg->dir = -prj_cfg->dir;
-            LOGI(TAG, "dir = %d", prj_cfg->dir);
+        // case BTN_DIR: // Switch direction
+        //     LOGI(TAG, "BTN_DIR");
+        //     prj_cfg->dir = -prj_cfg->dir;
+        //     LOGI(TAG, "dir = %d", prj_cfg->dir);
+        //     save_config();
+
+        //     // Restart
+        //     HAL_Delay(100);
+        //     HAL_NVIC_SystemReset();
+        //     break;
+
+        case BTN_MODE: // Switch mode
+            LOGI(TAG, "BTN_MODE");
+            prj_cfg->mode = !prj_cfg->mode;
+            LOGI(TAG, "mode = %d", prj_cfg->mode);
             save_config();
+
+            if (prj_cfg->mode == 1) {
+                led_string_set(ON);
+            } else {
+                led_string_set(OFF);
+            }
             break;
 
         default:
@@ -197,10 +224,6 @@ void btn_service_process(void) {
         }
 
         cnt = 0;
-    }
-
-    if (sub_process) {
-        sub_process();
     }
     
     return;

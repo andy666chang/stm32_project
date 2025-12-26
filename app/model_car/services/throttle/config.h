@@ -19,6 +19,10 @@ typedef struct prj_cfg_t {
     int8_t dir;
     uint16_t center;
     uint16_t margin;
+    uint16_t max;
+
+    bool mode;
+    uint8_t bar_idx;
 } prj_cfg_t;
 
 extern prj_cfg_t *prj_cfg;
@@ -26,3 +30,4 @@ extern prj_cfg_t *prj_cfg;
 void config_init(void);
 void load_config(void);
 void save_config(void);
+void dump_config(void);

@@ -65,8 +65,7 @@ int shell_servic_init(void) {
     // Init Ring buffer
     RING_BUF_INIT(shell_buf, shell_buf_data);
 
-    // initial uart
-    MX_USART1_UART_Init();
+    // initial uart irq
     HAL_UART_Receive_IT(&huart1, &tmp, 1);
 
     return 0;

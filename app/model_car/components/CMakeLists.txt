@@ -15,6 +15,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     shell/shell_btn.c
     shell/shell_thro.c
     shell/shell_config.c
+    shell/shell_led_bar.c
 )
 
 # Add include paths

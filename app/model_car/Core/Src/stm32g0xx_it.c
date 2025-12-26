@@ -149,7 +149,20 @@ void EXTI2_3_IRQHandler(void)
   /* USER CODE BEGIN EXTI2_3_IRQn 0 */
 
   /* USER CODE END EXTI2_3_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_3);
+  if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_3) != RESET)
+  {
+    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_3);
+    /* USER CODE BEGIN LL_EXTI_LINE_3_FALLING */
+    HAL_GPIO_EXTI_Falling_Callback(GPIO_PIN_3);
+    /* USER CODE END LL_EXTI_LINE_3_FALLING */
+  }
+  if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_3) != RESET)
+  {
+    LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_3);
+    /* USER CODE BEGIN LL_EXTI_LINE_3_RISING */
+    HAL_GPIO_EXTI_Rising_Callback(GPIO_PIN_3);
+    /* USER CODE END LL_EXTI_LINE_3_RISING */
+  }
   /* USER CODE BEGIN EXTI2_3_IRQn 1 */
 
   /* USER CODE END EXTI2_3_IRQn 1 */
@@ -163,7 +176,20 @@ void EXTI4_15_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_15_IRQn 0 */
 
   /* USER CODE END EXTI4_15_IRQn 0 */
-  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
+  if (LL_EXTI_IsActiveFallingFlag_0_31(LL_EXTI_LINE_12) != RESET)
+  {
+    LL_EXTI_ClearFallingFlag_0_31(LL_EXTI_LINE_12);
+    /* USER CODE BEGIN LL_EXTI_LINE_12_FALLING */
+    HAL_GPIO_EXTI_Falling_Callback(GPIO_PIN_12);
+    /* USER CODE END LL_EXTI_LINE_12_FALLING */
+  }
+  if (LL_EXTI_IsActiveRisingFlag_0_31(LL_EXTI_LINE_12) != RESET)
+  {
+    LL_EXTI_ClearRisingFlag_0_31(LL_EXTI_LINE_12);
+    /* USER CODE BEGIN LL_EXTI_LINE_12_RISING */
+    HAL_GPIO_EXTI_Rising_Callback(GPIO_PIN_12);
+    /* USER CODE END LL_EXTI_LINE_12_RISING */
+  }
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
 
   /* USER CODE END EXTI4_15_IRQn 1 */

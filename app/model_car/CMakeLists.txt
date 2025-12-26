@@ -11,7 +11,7 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
-# set(CMAKE_BUILD_TYPE "Release")
+set(CMAKE_BUILD_TYPE "Release")
 
 # Define the build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -55,6 +55,8 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     interfaces/rc.c
     interfaces/led.c
     interfaces/flash.c
+
+    system.c
 )
 
 # Add include paths

@@ -10,6 +10,23 @@ ninja -j16
 openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "program build/model_car.elf verify reset exit"
 
 pyocd reset
+
+# Erase all chip
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "init; reset halt; stm32l4x mass_erase 0; exit"
+
+# Read & Write NRST_MODE from 3 to 1
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "init; reset halt; set val [mdw 0x40022020]; echo \$val; exit"
+--> 0x40022020: ff4fe0aa
+
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "init; reset halt; stm32l4x option_write 0 0x20 0xEF6FE0AA; stm32l4x option_load; exit"
+
+# Read & Write RDP from 0xAA to 0xBB
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "init; reset halt; set val [mdw 0x40022020]; echo \$val; exit"
+0x40022020: ef6fe0aa
+
+openocd -f tools/openocd/interface/cmsis-dap.cfg -f tools/openocd/target/stm32g0x.cfg -c "init; reset halt; stm32l4x option_write 0 0x20 0xBB 0xFF; stm32l4x option_load; exit"
+
+
 ```
 
 ## CMD
