@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 23:50:16
+ * @Last Modified time: 2025-12-26 16:32:34
  */
 
 #include "service.h"
@@ -124,7 +124,7 @@ void btn_service_process(void) {
         // Diff Button state
         if (data != pre_btn) {
             // count timeout
-            time = log_timestamp();
+            time = GET_SYS_TIME();
             cnt++;
         }
         
@@ -133,13 +133,12 @@ void btn_service_process(void) {
     }
 
     // Remove initial noise
-    if (log_timestamp() <= 2000) {
+    if (GET_SYS_TIME() <= 2000) {
         cnt = 0;
     }
 
     // Count timeout
-    if ((log_timestamp() - time) >= BTN_TIMEOUT &&
-        cnt) {
+    if (WAIT_TIMEOUT(time, BTN_TIMEOUT) && cnt) {
         LOGI(TAG, "BTN cnt: %d", cnt);
         
         // Send event
@@ -225,7 +224,7 @@ void btn_service_process(void) {
 
         cnt = 0;
     }
-    
+
     return;
 }
 

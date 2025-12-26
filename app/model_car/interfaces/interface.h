@@ -6,6 +6,9 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define GET_SYS_TIME() log_timestamp()
+#define WAIT_TIMEOUT(var, ms) ((GET_SYS_TIME() - (var)) > (ms))
+
 void led_head_set(uint8_t id, bool en);
 bool led_head_get(uint8_t id);
 void led_tail_set(uint8_t id, bool en);
