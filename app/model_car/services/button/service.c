@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 16:32:34
+ * @Last Modified time: 2025-12-26 16:37:57
  */
 
 #include "service.h"
@@ -10,8 +10,6 @@
 #include "gpio.h"
 
 #include "interfaces/interface.h"
-
-#include "services/throttle/config.h"
 
 #include "components/ring_buf/ring_buf.h"
 #include "components/log/log.h"

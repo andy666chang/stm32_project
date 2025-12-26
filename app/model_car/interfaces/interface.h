@@ -9,6 +9,18 @@
 #define GET_SYS_TIME() log_timestamp()
 #define WAIT_TIMEOUT(var, ms) ((GET_SYS_TIME() - (var)) > (ms))
 
+typedef struct prj_cfg_t {
+    uint8_t version;
+    
+    int8_t dir;
+    uint16_t center;
+    uint16_t margin;
+    uint16_t max;
+
+    bool mode;
+    uint8_t bar_idx;
+} prj_cfg_t;
+
 void led_head_set(uint8_t id, bool en);
 bool led_head_get(uint8_t id);
 void led_tail_set(uint8_t id, bool en);
@@ -29,3 +41,11 @@ int rc_init(void);
 int flash_erase(uint32_t addr, uint32_t len);
 int flash_write(uint32_t addr, uint8_t *data, uint32_t len);
 int flash_read(uint32_t addr, uint8_t *data, uint32_t len);
+
+void config_init(void);
+void load_config(void);
+void save_config(void);
+void dump_config(void);
+
+
+extern prj_cfg_t *prj_cfg;

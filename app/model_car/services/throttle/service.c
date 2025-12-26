@@ -2,11 +2,10 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 17:06:01
+ * @Last Modified time: 2025-12-26 17:06:34
  */
 
 #include "service.h"
-#include "config.h"
 
 #include "gpio.h"
 

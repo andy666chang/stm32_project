@@ -2,12 +2,11 @@
  * @Author: andy.chang 
  * @Date: 2024-11-25 22:32:13 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 16:16:16
+ * @Last Modified time: 2025-12-26 16:38:41
  */
 
 #include <math.h>
 #include "interface.h"
-#include "../services/throttle/config.h"
 #include "gpio.h"
 
 #include "components/log/log.h"
