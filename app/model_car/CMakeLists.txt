@@ -57,6 +57,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     interfaces/led_bar.c
     interfaces/flash.c
     interfaces/config.c
+    interfaces/crc.c
 
     system.c
 )
