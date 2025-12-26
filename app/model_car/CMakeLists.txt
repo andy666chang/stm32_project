@@ -40,6 +40,7 @@ add_executable(${CMAKE_PROJECT_NAME})
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
 add_subdirectory(components)
+add_subdirectory(interfaces)
 add_subdirectory(services)
 
 # Link directories setup
@@ -51,13 +52,6 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
     Core/Src/retarget.c
-
-    interfaces/rc.c
-    interfaces/led.c
-    interfaces/led_bar.c
-    interfaces/flash.c
-    interfaces/config.c
-    interfaces/crc.c
 
     system.c
 )
