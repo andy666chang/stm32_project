@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define GET_SYS_TIME() log_timestamp()
+#define GET_SYS_TIME() HAL_GetTick()
 #define WAIT_TIMEOUT(var, ms) ((GET_SYS_TIME() - (var)) > (ms))
 
 typedef struct prj_cfg_t {

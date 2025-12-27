@@ -244,8 +244,7 @@ static inline void led_set_low(void) {
     // T0H: 0.3 +- 0.15 us
     LL_GPIO_SetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP();
+    __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
 
     // T0L: 0.9 +- 0.15 us
     LL_GPIO_ResetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
@@ -254,7 +253,6 @@ static inline void led_set_low(void) {
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
 #else
     // T0H: 0.4 +- 0.15 us
     LL_GPIO_SetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
@@ -277,19 +275,19 @@ static inline void led_set_low(void) {
  */
 static inline void led_set_high(void) {
 #ifdef SK6812
-    // T1H: 0.6 +- 0.15 us
+    // T1H: 0.9 +- 0.15 us
     LL_GPIO_SetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
 
-    // T1L: 0.6 +- 0.15 us
+    // T1L: 0.3 +- 0.15 us
     LL_GPIO_ResetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
     __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-    __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    __NOP(); __NOP();
 #else
     // T1H: 0.8 +- 0.15 us
     LL_GPIO_SetOutputPin(CHASIS_GPIO_Port, CHASIS_Pin);
@@ -344,7 +342,7 @@ static void led_color_set(uint8_t r, uint8_t g, uint8_t b) {
  */
 void thro_led_update(int16_t thro) {
     uint8_t idx = prj_cfg->bar_idx;
-    uint8_t step = floorf(fabs(prj_cfg->max - prj_cfg->center) / 12.0);
+    uint8_t step = floorf(abs(prj_cfg->max - prj_cfg->center) / 12.0);
     uint8_t on, off;
 
     if (idx >= ARRAY_SIZE(led_ref)) {
