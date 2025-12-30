@@ -2,12 +2,10 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 10:40:40 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:36:56
+ * @Last Modified time: 2025-12-26 16:56:29
  */
 
-#include "config.h"
-
-#include "interfaces/interface.h"
+#include "interface.h"
 
 #include "components/log/log.h"
 #include "crc.h"
@@ -51,8 +49,8 @@ void config_init(void) {
     LOGI(TAG, "cfg_pack.crc32: 0x%08X", cfg_pack.crc32);
 
     // Verify data valid with CRC32
-    uint32_t crc = HAL_CRC_Calculate(&hcrc, (uint32_t *)&cfg_pack.pack,
-                                         sizeof(cfg_pack.pack));
+    uint32_t crc =
+        crc_calculate((uint8_t *)&cfg_pack.pack, sizeof(cfg_pack.pack));
     if (cfg_pack.crc32 != crc || cfg_pack.header != MAGIC) {
         // Replace by default config
         LOGW(TAG, "Invalid data in flash, reset to default");
@@ -76,8 +74,8 @@ void save_config(void) {
     cfg_pack.header = MAGIC;
 
     // Calculate CRC32
-    cfg_pack.crc32 = HAL_CRC_Calculate(&hcrc, (uint32_t *)&cfg_pack.pack,
-                                         sizeof(cfg_pack.pack));
+    cfg_pack.crc32 =
+        crc_calculate((uint8_t *)&cfg_pack.pack, sizeof(cfg_pack.pack));
 
     // Erase and write to flash
     flash_erase(CFG_ADDR, sizeof(cfg_pack_t));

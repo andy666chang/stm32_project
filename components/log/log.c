@@ -19,9 +19,9 @@ uint32_t log_timestamp() {
         return 0;
 }
 
-void log_write(log_level_t level, const char *tag, const char *format,
-                  ...) {
-    (void) tag;
+__attribute__((weak)) void log_write(log_level_t level, const char *tag,
+                                     const char *format, ...) {
+    (void)tag;
     if (g_log_level >= level) {
         va_list arg;
         va_start(arg, format);

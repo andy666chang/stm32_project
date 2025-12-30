@@ -1,9 +1,8 @@
 
+FILE(GLOB interface_src *.c)
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-    button/service.c
-    throttle/service.c
-    shell/service.c
+    ${interface_src}
 )
 
 # Add include paths

@@ -6,6 +6,21 @@
 #include <stdbool.h>
 #include <string.h>
 
+#define GET_SYS_TIME() HAL_GetTick()
+#define WAIT_TIMEOUT(var, ms) ((GET_SYS_TIME() - (var)) > (ms))
+
+typedef struct prj_cfg_t {
+    uint8_t version;
+    
+    int8_t dir;
+    uint16_t center;
+    uint16_t margin;
+    uint16_t max;
+
+    bool mode;
+    uint8_t bar_idx;
+} prj_cfg_t;
+
 void led_head_set(uint8_t id, bool en);
 bool led_head_get(uint8_t id);
 void led_tail_set(uint8_t id, bool en);
@@ -14,7 +29,7 @@ void led_chasis_set(bool en);
 bool led_chasis_get(void);
 void led_fire_set(bool en);
 bool led_fire_get(void);
-void led_string_set(bool en);
+void led_bar_set(bool en);
 void thro_led_update(int16_t thro);
 void thro_led_brake(void);
 void thro_led_set(uint8_t r, uint8_t g, uint8_t b);
@@ -26,3 +41,12 @@ int rc_init(void);
 int flash_erase(uint32_t addr, uint32_t len);
 int flash_write(uint32_t addr, uint8_t *data, uint32_t len);
 int flash_read(uint32_t addr, uint8_t *data, uint32_t len);
+
+void config_init(void);
+void load_config(void);
+void save_config(void);
+void dump_config(void);
+
+uint32_t crc_calculate(uint8_t *data, uint32_t len);
+
+extern prj_cfg_t *prj_cfg;

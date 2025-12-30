@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 15:01:03 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-01-02 16:37:12
+ * @Last Modified time: 2025-12-26 16:38:29
  */
 
 #include "shell_config.h"
@@ -12,7 +12,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "services/throttle/config.h"
+#include "interfaces/interface.h"
 
 #include "components/log/log.h"
 
