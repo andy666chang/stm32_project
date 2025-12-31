@@ -10,6 +10,7 @@ extern UART_HandleTypeDef PORT;
 #if defined(__GNUC__)
 
 #include <stdbool.h>
+#include <string.h>
 #include "components/ring_buf/ring_buf.h"
 
 static uint8_t tx_buf_data[512];
@@ -55,7 +56,7 @@ int _write(int fd, char * ptr, int len)
   (void) fd;
 
   // Push data to ring buffer
-  for (uint32_t i = 0; i < len; i++) {
+  for (int i = 0; i < len; i++) {
     while (tx_buf.cnt >= tx_buf.len){
       HAL_Delay(5);
     }
@@ -67,6 +68,8 @@ int _write(int fd, char * ptr, int len)
   if (dma_tx_done) {
     tx_dma_tranfer();
   }
+
+  return len;
 }
 #elif defined (__ICCARM__)
 #include "LowLevelIOInterface.h"
