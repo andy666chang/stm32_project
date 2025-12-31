@@ -115,6 +115,8 @@ int main(void)
     btn_service_process();
     thro_service_process();
     shell_service_process();
+
+    __WFI();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

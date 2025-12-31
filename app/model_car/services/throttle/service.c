@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 17:06:34
+ * @Last Modified time: 2025-12-31 22:44:39
  */
 
 #include "service.h"
@@ -253,16 +253,16 @@ void thro_service_process(void) {
         //   throttle larger than center
         if ((abs(thro) < abs(pre_thro)) &&
             (abs(thro-pre_thro) > prj_cfg->margin) &&
-            (abs(thro) > prj_cfg->margin)) {
+            (thro > prj_cfg->margin)) {
             LOGI(TAG, "THRO_SHORT");
             event_cap |= BIT(THRO_SHORT);
             short_timeout = GET_SYS_TIME();
         }
 
         // Check brake
-        //   previous throttle in center
+        //   bypass already brake
         //   throttle is negative
-        if ((abs(pre_thro) < prj_cfg->margin) &&
+        if (!(event_cap & BIT(THRO_BRAKE)) &&
             (abs(thro) > prj_cfg->margin) &&
             (thro < 0)) {
             LOGI(TAG, "THRO_BRAKE");
@@ -280,9 +280,9 @@ void thro_service_process(void) {
 
         // Check fire
         //   previous throttle larger than margin
-        //   throttle in center
+        //   throttle in center/negative
         if ((pre_thro > prj_cfg->margin) &&
-            (abs(thro) < prj_cfg->margin)) {
+            (thro < prj_cfg->margin)) {
             LOGI(TAG, "THRO_FIRE");
             event_cap |= BIT(THRO_FIRE);
             fire_timeout = GET_SYS_TIME();
@@ -319,12 +319,12 @@ void thro_service_process(void) {
     }
 
     // wait
-    if ((event_cap & (BIT(THRO_WAIT) || BIT(THRO_INPUT)))) {
+    if (event_cap & BIT(THRO_WAIT)) {
         thro_blink_wait();
     }
 
     // Brake
-    if ((event_cap & (BIT(THRO_BRAKE) || BIT(THRO_INPUT)))) {
+    if (event_cap & BIT(THRO_BRAKE)) {
         thro_brake();
     }
 

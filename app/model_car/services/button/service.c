@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-01 00:31:12 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2025-12-26 16:45:12
+ * @Last Modified time: 2025-12-31 22:42:54
  */
 
 #include "service.h"
@@ -23,7 +23,7 @@
 
 #define BTN_SWITCH      1
 #define BTN_HIGH_BEAM   2
-#define BTN_FALSH       3
+#define BTN_FLASH       3
 #define BTN_LED_SEL     4
 #define BTN_CALI        6
 #define BTN_MODE        7
@@ -160,8 +160,7 @@ void btn_service_process(void) {
             btn_high_beam();
             break;
 
-        case BTN_FALSH: // LED Flash
-            LOGI(TAG, "BTN_FLASH");
+        case BTN_FLASH: // LED Flash
             if (led_stop_blink) {
                 if (sw_state == 0)
                     led_chasis_set(OFF);
@@ -172,6 +171,7 @@ void btn_service_process(void) {
             } else {
                 led_stop_blink = true;
             }
+            LOGI(TAG, "BTN_FLASH: %d", led_stop_blink);
             break;
         
         case BTN_LED_SEL:
