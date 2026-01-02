@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-08-03 01:02:21 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-05 21:22:48
+ * @Last Modified time: 2026-01-02 13:24:50
  */
 
 #include <stdio.h>
@@ -13,6 +13,7 @@
 
 #include <errno.h>
 
+#include "shell.h"
 #include "components/log/log.h"
 
 #define TAG "SHELL"
@@ -46,7 +47,7 @@ enum
     SHELL_RECEIVE_TILDE_EXP,
 };
 
-#define SHELL_BUF_LEN 512
+#define SHELL_BUF_LEN 128
 #define SHELL_HIS_LEN 5
 
 static char shell_his[SHELL_HIS_LEN][SHELL_BUF_LEN] = {0};
@@ -55,6 +56,8 @@ static uint16_t h_idx = 0;
 static char shell_buf[SHELL_BUF_LEN] = {0};
 static uint16_t idx = 0;
 static uint8_t state = SHELL_RECEIVE_DEFAULT;
+
+int parse_shell(char *shell, uint32_t len);
 
 static void shell_history_record(char *pdata, uint16_t len)
 {
@@ -275,4 +278,104 @@ void shell_process(uint8_t *data, uint16_t len)
     fflush(stdout);
 }
 
+////////////////////////////////////////
 
+static uint8_t tab_idx = 0;
+static char tab[10] = {0};
+static void shell_dump(struct shell_t shell_list[]) {
+    for (size_t i = 0; shell_list[i].name != NULL; i++) {
+        if (shell_list[i].sub) {
+            LOGI(TAG, "%s%s: %s", tab, shell_list[i].name,
+                 shell_list[i].info);
+
+            tab[tab_idx++] = '\t';
+            shell_dump(shell_list[i].sub);
+            tab[--tab_idx] = '\0';
+        } else {
+            LOGI(TAG, "%s%s - %s", tab, shell_list[i].name,
+                 shell_list[i].info);
+        }
+    }
+}
+
+static int execute_shell(int argc, char *argv[], struct shell_t shell_list[]) {
+    for (size_t i = 0; shell_list[i].name != NULL; i++) {
+        if ( !strcasecmp(argv[0], shell_list[i].name)) {
+            if (shell_list[i].sub && argc >= 1) {
+                return execute_shell(argc-1, argv+1, shell_list[i].sub);
+            }
+
+            if (shell_list[i].func) {
+                return shell_list[i].func(argc-1, argv+1);
+            }
+        }
+    }
+    
+    return -EINVAL;
+}
+
+__attribute__((weak)) int parse_shell(char *shell, uint32_t len) {
+    (void) len;
+    int ret = 0;
+
+    uint8_t argc = 0;
+    char *saveptr;
+    char *argv[20] = {NULL};
+
+    // parse shell
+    argv[argc] = strtok_r(shell, " ", &saveptr);
+
+    while(argv[argc] != NULL) {
+        argc++;
+
+        // check overflow
+        if (argc > (sizeof(argv)/sizeof(argv[0])) - 1) {
+            break;
+        }
+
+        argv[argc] = strtok_r(NULL, " ", &saveptr);
+    }
+
+    // check shell keyword
+    extern struct shell_t _shell_t_list_start[];
+    ret = execute_shell(argc, argv, _shell_t_list_start);
+    switch (ret) {
+        case 0:
+            break;
+        case -EINVAL:
+            LOGE(TAG, "Invalid argument");
+            break;
+        
+        default:
+            LOGE(TAG, "Unknow: %d", ret);
+            break;
+    }
+    
+    return 0;
+}
+
+////////////////////////////////////////
+
+static int shell_help(int argc, char *argv[]) {
+    (void) argc;
+    (void) argv;
+
+    extern struct shell_t _shell_t_list_start[];
+    shell_dump(_shell_t_list_start);
+
+    return 0;
+}
+
+SHELL_CMD_DEFINE(help) = {
+    .name = "help",
+    .info = "list shell",
+    .func = shell_help,
+    .sub = NULL,
+};
+
+SHELL_CMD_DEFINE(zz_end) = {
+    .name = NULL,
+    .info = NULL,
+    .func = NULL,
+    .sub = NULL,
+};

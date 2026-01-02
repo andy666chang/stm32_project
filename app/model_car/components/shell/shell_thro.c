@@ -2,10 +2,8 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 15:01:03 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 15:20:56
+ * @Last Modified time: 2026-01-02 13:18:14
  */
-
-#include "shell_thro.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,17 +11,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "services/throttle/service.h"
-
+#include "components/shell/shell.h"
 #include "components/log/log.h"
+
+#include "services/throttle/service.h"
 
 #define TAG "SHELL-THRO"
 
-int shell_thro(int argc, char *argv[]) {
-    // for (size_t i = 0; i < argc; i++) {
-    //     LOGI(TAG, " led sub: %s", argv[i]);
-    // }
-
+static int shell_thro(int argc, char *argv[]) {
     int thro = 0;
 
     for (int i = 0; i < argc; i++) {
@@ -37,3 +32,10 @@ int shell_thro(int argc, char *argv[]) {
 
     return 0;
 }
+
+SHELL_CMD_DEFINE(thro) = {
+    .name = "thro",
+    .info = "thro -v <1000...2000>",
+    .func = shell_thro,
+    .sub = NULL,
+};

@@ -2,7 +2,7 @@
  * @Author: andy.chang 
  * @Date: 2024-12-31 15:01:03 
  * @Last Modified by: andy.chang
- * @Last Modified time: 2024-12-31 15:17:47
+ * @Last Modified time: 2026-01-02 13:18:41
  */
 
 #include <stdio.h>
@@ -11,19 +11,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "shell_led.h"
-#include "interfaces/interface.h"
-
+#include "components/shell/shell.h"
 #include "components/log/log.h"
+
+#include "interfaces/interface.h"
 
 #define TAG "SHELL-LED"
 
-
 int shell_led(int argc, char *argv[]) {
-    // for (size_t i = 0; i < argc; i++) {
-    //     LOGI(TAG, " led sub: %s", argv[i]);
-    // }
-
     int idx = 99, level = 99;
 
     for (int i = 0; i < argc; i++) {
@@ -78,3 +73,10 @@ int shell_led(int argc, char *argv[]) {
 
     return 0;
 }
+
+SHELL_CMD_DEFINE(led) = {
+    .name = "led",
+    .info = "led -i <0...5> -l <0...1>",
+    .func = shell_led,
+    .sub = NULL,
+};
